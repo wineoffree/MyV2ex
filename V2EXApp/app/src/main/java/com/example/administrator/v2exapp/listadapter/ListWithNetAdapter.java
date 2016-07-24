@@ -11,8 +11,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.administrator.v2exapp.R;
-import com.example.administrator.v2exapp.downloadimg.DownImage;
-import com.example.administrator.v2exapp.downloadimg.DownImageTask;
+import com.example.netlibrary.DownImageTask;
+
 
 import java.util.List;
 import java.util.Map;
@@ -33,6 +33,7 @@ public class ListWithNetAdapter extends BaseAdapter {
         this.index=index;
         this.context = context;
         layoutInflater = layoutInflater.from(context);
+        scrollState=false;
     }
     public int  getIndex(){
         return this.index;
@@ -89,12 +90,12 @@ public class ListWithNetAdapter extends BaseAdapter {
         viewHolder.name.setText(list.get(position).get("name").toString());
         viewHolder.type.setText(list.get(position).get("type").toString());
         viewHolder.showId.setText(list.get(position).get("showId").toString());
-        DownImage downImage;
         viewHolder.newUrl=list.get(position).get("newUrl").toString();
 
         if (!scrollState){
             //加载图片
-            new DownImageTask(viewHolder.img,true,index).execute(list.get(position).get("ima"));
+            Log.d("imamamama",viewHolder.img.toString());
+            new DownImageTask(viewHolder.img).execute(list.get(position).get("ima"));
             //设置tag为1表示已加载过数据
             viewHolder.img.setTag("1");
         }else{

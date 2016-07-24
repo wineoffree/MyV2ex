@@ -6,10 +6,8 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.ListView;
 
-import com.example.administrator.v2exapp.MainActivity;
 import com.example.administrator.v2exapp.listadapter.ListWithNetAdapter;
 import com.example.administrator.v2exapp.save.SaveTask;
-import com.example.administrator.v2exapp.save.SaveToFile;
 
 import java.util.List;
 import java.util.Map;

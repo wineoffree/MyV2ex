@@ -1,6 +1,5 @@
 package com.example.administrator.v2exapp.netspider;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -16,12 +15,10 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.example.administrator.v2exapp.MainActivity;
 import com.example.administrator.v2exapp.R;
-import com.example.administrator.v2exapp.SecondActivity;
-import com.example.administrator.v2exapp.downloadimg.DownImageTask;
-import com.example.administrator.v2exapp.save.CacheImage;
 import com.example.administrator.v2exapp.save.DateFromFile;
+import com.example.netlibrary.CacheImage;
+import com.example.netlibrary.DownImageTask;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -94,7 +91,7 @@ public class SecondTask extends AsyncTask<String, Integer, List<Map<String,Strin
                     TextView name = (TextView) (view.findViewById(R.id.name));
                     name.setText(result.get(i).get("name").toString());
                     ImageView img = (ImageView) (view.findViewById(R.id.ima));
-                    new DownImageTask(img, false, 0).execute(result.get(i).get("ima"));
+                    new DownImageTask(img).execute(result.get(i).get("ima"));
                     linearLayout.addView(view);
                 }
             }

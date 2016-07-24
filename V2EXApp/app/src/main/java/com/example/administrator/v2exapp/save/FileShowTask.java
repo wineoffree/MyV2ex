@@ -6,8 +6,8 @@ import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.ListView;
-
 import com.example.administrator.v2exapp.listadapter.ListWithoutNetAdapter;
+import com.example.netlibrary.CacheImage;
 
 import java.util.ArrayList;
 import java.util.List;

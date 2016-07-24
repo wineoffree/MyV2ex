@@ -1,21 +1,7 @@
 package com.example.administrator.v2exapp.save;
 
-import android.app.ProgressDialog;
-import android.content.Context;
 import android.os.AsyncTask;
-import android.text.Html;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
-import com.example.administrator.v2exapp.R;
-import com.example.administrator.v2exapp.downloadimg.DownImageTask;
-import com.example.administrator.v2exapp.save.SaveToFile;
-
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -48,8 +34,6 @@ public class SaveTask extends AsyncTask<String, Integer, List<Map<String,String>
         SaveToFile saveToFile=new SaveToFile(index);
         saveToFile.setContent(content);
         saveToFile.saveContent();
-        //saveToFile.setConfigure(String.valueOf(list.size()));
-        //saveToFile.saveConfigure();
         return list;
     }
 }

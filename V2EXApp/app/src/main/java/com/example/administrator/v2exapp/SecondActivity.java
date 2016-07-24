@@ -14,7 +14,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.administrator.v2exapp.netspider.SecondTask;
-import com.example.administrator.v2exapp.save.DateFromFile;
 
 public class SecondActivity extends AppCompatActivity {
     //从文件获取位置
@@ -33,7 +32,7 @@ public class SecondActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_second);
         progressDialog = new ProgressDialog(this);
-        progressDialog.setTitle("正在下载....");
+        progressDialog.setTitle("loading...");
         Log.d("haha","wuxian");
         //获取URL
         Intent intent=getIntent();

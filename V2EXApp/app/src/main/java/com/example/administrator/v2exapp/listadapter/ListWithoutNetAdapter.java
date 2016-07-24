@@ -2,7 +2,6 @@ package com.example.administrator.v2exapp.listadapter;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,8 +10,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.administrator.v2exapp.R;
-import com.example.administrator.v2exapp.downloadimg.DownImage;
-import com.example.administrator.v2exapp.downloadimg.DownImageTask;
 
 import java.util.ArrayList;
 import java.util.List;

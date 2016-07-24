@@ -1,27 +1,11 @@
 package com.example.administrator.v2exapp.search;
 
-import android.app.ProgressDialog;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
-import android.os.Environment;
-import android.text.Html;
-import android.text.method.LinkMovementMethod;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.TextView;
 
-import com.example.administrator.v2exapp.R;
-import com.example.administrator.v2exapp.downloadimg.DownImageTask;
-import com.example.administrator.v2exapp.listadapter.ListWithoutNetAdapter;
 import com.example.administrator.v2exapp.listadapter.SearchItemAdapter;
-import com.example.administrator.v2exapp.netspider.DrawDate;
-import com.example.administrator.v2exapp.save.CacheImage;
 import com.example.administrator.v2exapp.save.DateFromFile;
 
 import java.util.ArrayList;

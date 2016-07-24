@@ -1,21 +1,19 @@
 package com.example.administrator.v2exapp.search;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.SearchView;
-import android.text.TextUtils;
 import android.widget.ListView;
+import android.widget.SearchView;
 
 import com.example.administrator.v2exapp.Date;
 import com.example.administrator.v2exapp.R;
 import com.example.administrator.v2exapp.SecondActivity;
-import com.example.administrator.v2exapp.listadapter.ListWithNetAdapter;
 import com.example.administrator.v2exapp.listadapter.SearchItemAdapter;
-import com.example.administrator.v2exapp.netspider.FirstTask;
 
 public class SearchItemActivity extends AppCompatActivity {
     //listview
