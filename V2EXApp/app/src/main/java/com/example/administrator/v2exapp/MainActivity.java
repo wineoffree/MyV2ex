@@ -2,6 +2,7 @@ package com.example.administrator.v2exapp;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.support.v4.app.Fragment;
@@ -18,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -48,26 +50,25 @@ public class MainActivity extends AppCompatActivity {
     HorizontalScrollView horizontalScrollView;
     // view数组
     private List<View> viewList;
-   //viewPager
-   ViewPager vp;
-   //listview
+    //viewPager
+    ViewPager vp;
+    //listview
     ListView listView;
-//存放每页的view
-ArrayList<View> views;
     //listview适配器
     ListWithNetAdapter listWithNetAdapter;
-//进度条
+    //进度条
     ProgressDialog progressDialog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         InitRadioButton();
         InitialPager();
         MyPagerAdapter adapter = new MyPagerAdapter(viewList);
 
         //设定viewPager适配器
-       vp = (ViewPager)findViewById(R.id.viewpager);
+        vp = (ViewPager)findViewById(R.id.viewpager);
         vp.setAdapter(adapter);
         vp.addOnPageChangeListener(new MyPageChangeListener());
 
@@ -75,8 +76,8 @@ ArrayList<View> views;
         progressDialog.setTitle("正在下载....");
 
         listWithNetAdapter=new ListWithNetAdapter(this);
-        FirstTask downloadTheLastTask=new  FirstTask(progressDialog,listWithNetAdapter,listView,MainActivity.this,0);
-        downloadTheLastTask.execute();
+        FirstTask firstTask=new  FirstTask(progressDialog,listWithNetAdapter,listView,MainActivity.this,0);
+        firstTask.execute();
         //初始化界面
 
     }
@@ -119,7 +120,8 @@ ArrayList<View> views;
                 btn1.setBackgroundColor(Color.rgb(248,248,255));
                 currentIndex=1;
                 vp.setCurrentItem(currentIndex-1);
-                listView=(ListView) views.get(0).findViewById(R.id.list);
+                listView=(ListView)viewList.get(0).findViewById(R.id.list);
+                listView.setOnItemClickListener(new MyListViewClicklistener());
                 FirstTask downloadTheLastTask=new  FirstTask(progressDialog,listWithNetAdapter,listView,MainActivity.this,0);
                 downloadTheLastTask.execute();
             }
@@ -132,7 +134,8 @@ ArrayList<View> views;
                 btn2.setBackgroundColor(Color.rgb(248,248,255));
                 currentIndex=2;
                 vp.setCurrentItem(currentIndex-1);
-                listView=(ListView) views.get(1).findViewById(R.id.list);
+                listView=(ListView)viewList.get(1).findViewById(R.id.list);
+                listView.setOnItemClickListener(new MyListViewClicklistener());
                 FirstTask downloadTheLastTask=new  FirstTask(progressDialog,listWithNetAdapter,listView,MainActivity.this,1);
                 downloadTheLastTask.execute();
             }
@@ -145,7 +148,8 @@ ArrayList<View> views;
                 btn3.setBackgroundColor(Color.rgb(248,248,255));
                 currentIndex=3;
                 vp.setCurrentItem(currentIndex-1);
-                listView=(ListView) views.get(2).findViewById(R.id.list);
+                listView=(ListView)viewList.get(2).findViewById(R.id.list);
+                listView.setOnItemClickListener(new MyListViewClicklistener());
                 FirstTask downloadTheLastTask=new  FirstTask(progressDialog,listWithNetAdapter,listView,MainActivity.this,2);
                 downloadTheLastTask.execute();
             }
@@ -158,7 +162,8 @@ ArrayList<View> views;
                 btn4.setBackgroundColor(Color.rgb(248,248,255));
                 currentIndex=4;
                 vp.setCurrentItem(currentIndex-1);
-                listView=(ListView) views.get(3).findViewById(R.id.list);
+                listView=(ListView)viewList.get(3).findViewById(R.id.list);
+                listView.setOnItemClickListener(new MyListViewClicklistener());
                 FirstTask downloadTheLastTask=new  FirstTask(progressDialog,listWithNetAdapter,listView,MainActivity.this,3);
                 downloadTheLastTask.execute();
             }
@@ -171,7 +176,8 @@ ArrayList<View> views;
                 btn5.setBackgroundColor(Color.rgb(248,248,255));
                 currentIndex=5;
                 vp.setCurrentItem(currentIndex-1);
-                listView=(ListView) views.get(4).findViewById(R.id.list);
+                listView=(ListView)viewList.get(4).findViewById(R.id.list);
+                listView.setOnItemClickListener(new MyListViewClicklistener());
                 FirstTask downloadTheLastTask=new  FirstTask(progressDialog,listWithNetAdapter,listView,MainActivity.this,4);
                 downloadTheLastTask.execute();
             }
@@ -184,7 +190,8 @@ ArrayList<View> views;
                 btn6.setBackgroundColor(Color.rgb(248,248,255));
                 currentIndex=6;
                 vp.setCurrentItem(currentIndex-1);
-                listView=(ListView) views.get(5).findViewById(R.id.list);
+                listView=(ListView)viewList.get(5).findViewById(R.id.list);
+                listView.setOnItemClickListener(new MyListViewClicklistener());
                 FirstTask downloadTheLastTask=new  FirstTask(progressDialog,listWithNetAdapter,listView,MainActivity.this,5);
                 downloadTheLastTask.execute();
             }
@@ -197,7 +204,8 @@ ArrayList<View> views;
                 btn7.setBackgroundColor(Color.rgb(248,248,255));
                 currentIndex=7;
                 vp.setCurrentItem(currentIndex-1);
-                listView=(ListView) views.get(6).findViewById(R.id.list);
+                listView=(ListView)viewList.get(6).findViewById(R.id.list);
+                listView.setOnItemClickListener(new MyListViewClicklistener());
                 FirstTask downloadTheLastTask=new  FirstTask(progressDialog,listWithNetAdapter,listView,MainActivity.this,6);
                 downloadTheLastTask.execute();
             }
@@ -210,7 +218,8 @@ ArrayList<View> views;
                 btn8.setBackgroundColor(Color.rgb(248,248,255));
                 currentIndex=8;
                 vp.setCurrentItem(currentIndex-1);
-                listView=(ListView) views.get(7).findViewById(R.id.list);
+                listView=(ListView)viewList.get(7).findViewById(R.id.list);
+                listView.setOnItemClickListener(new MyListViewClicklistener());
                 FirstTask downloadTheLastTask=new  FirstTask(progressDialog,listWithNetAdapter,listView,MainActivity.this,7);
                 downloadTheLastTask.execute();
             }
@@ -223,7 +232,8 @@ ArrayList<View> views;
                 btn9.setBackgroundColor(Color.rgb(248,248,255));
                 currentIndex=9;
                 vp.setCurrentItem(currentIndex-1);
-                listView=(ListView) views.get(8).findViewById(R.id.list);
+                listView=(ListView)viewList.get(8).findViewById(R.id.list);
+                listView.setOnItemClickListener(new MyListViewClicklistener());
                 FirstTask downloadTheLastTask=new  FirstTask(progressDialog,listWithNetAdapter,listView,MainActivity.this,8);
                 downloadTheLastTask.execute();
             }
@@ -236,7 +246,8 @@ ArrayList<View> views;
                 btn10.setBackgroundColor(Color.rgb(248,248,255));
                 currentIndex=10;
                 vp.setCurrentItem(currentIndex-1);
-                listView=(ListView) views.get(9).findViewById(R.id.list);
+                listView=(ListView)viewList.get(9).findViewById(R.id.list);
+                listView.setOnItemClickListener(new MyListViewClicklistener());
                 FirstTask downloadTheLastTask=new  FirstTask(progressDialog,listWithNetAdapter,listView,MainActivity.this,9);
                 downloadTheLastTask.execute();
             }
@@ -249,7 +260,8 @@ ArrayList<View> views;
                 btn11.setBackgroundColor(Color.rgb(248,248,255));
                 currentIndex=11;
                 vp.setCurrentItem(currentIndex-1);
-                listView=(ListView) views.get(10).findViewById(R.id.list);
+                listView=(ListView)viewList.get(10).findViewById(R.id.list);
+                listView.setOnItemClickListener(new MyListViewClicklistener());
                 FirstTask downloadTheLastTask=new  FirstTask(progressDialog,listWithNetAdapter,listView,MainActivity.this,10);
                 downloadTheLastTask.execute();
             }
@@ -266,21 +278,19 @@ ArrayList<View> views;
     public void InitialPager() {
         viewList = new ArrayList<View>();// 将要分页显示的View装入数组中
         LayoutInflater inflater = getLayoutInflater();
-        views=new ArrayList<View>();
+
         for(int i=0;i<11;i++) {
-           View view = inflater.inflate(R.layout.layout_viewofpager, null);
-            views.add(view);
+            View view = inflater.inflate(R.layout.layout_viewofpager, null);
             viewList.add(view);
         }
-        listView=(ListView) views.get(0).findViewById(R.id.list);
+        listView=(ListView)  viewList.get(0).findViewById(R.id.list);
+        listView.setOnItemClickListener(new MyListViewClicklistener());
     }
     //viewpager的页面改变监听器
     public class MyPageChangeListener implements ViewPager.OnPageChangeListener {
-
-
         @Override
         public void onPageSelected(int arg0) {
-                   if(arg0==0){btn1.performClick();horizontalScrollView.scrollTo(0,0);}
+            if(arg0==0){btn1.performClick();horizontalScrollView.scrollTo(0,0);}
             if(arg0==1){btn2.performClick();horizontalScrollView.scrollTo(0,0);}
             if(arg0==2){btn3.performClick();horizontalScrollView.scrollTo(0,0);}
             if(arg0==3){btn4.performClick();horizontalScrollView.scrollTo(0,0);}
@@ -304,10 +314,28 @@ ArrayList<View> views;
         }
     }
 
+    //listview items监听器
+    class MyListViewClicklistener implements AdapterView.OnItemClickListener{
+        @Override
+        public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+            Log.d("haha","qweqwrewrwe");
+            Date date=new Date(listWithNetAdapter.getList().get(position).get("newUrl"),
+                    listWithNetAdapter.getList().get(position).get("name"),
+                    listWithNetAdapter.getList().get(position).get("type"),
+                    listWithNetAdapter.getList().get(position).get("showId"),
+                    listWithNetAdapter.getList().get(position).get("time"),
+                    listWithNetAdapter.getList().get(position).get("content"));
+            Bundle dates=new Bundle();
+            dates.putSerializable("dates",date);
+            Intent intent=new Intent(MainActivity.this,SecondActivity.class);
+            intent.putExtras(dates);
+            startActivity(intent);
+        }
+    }
     //页面listview适配器
     //网络加载时最新内容的适配器
     public class ListWithNetAdapter extends BaseAdapter {
-
+        Bitmap bitmap;
         private Context context;
         private LayoutInflater layoutInflater;
         private List<Map<String,String>> list;
@@ -347,7 +375,7 @@ ArrayList<View> views;
         @Override
         public View getView(final int position, View convertView, ViewGroup parent) {
             View view = null;
-           final ViewHolder viewHolder;
+            final ViewHolder viewHolder;
 
             if (convertView == null ) {
                 viewHolder = new ViewHolder();
@@ -360,7 +388,7 @@ ArrayList<View> views;
                 viewHolder.showId = (TextView)convertView.findViewById(R.id.showId);
                 convertView.setTag(viewHolder);
             }
-          else {
+            else {
 
                 viewHolder = (ViewHolder)convertView.getTag();
             }
@@ -377,7 +405,7 @@ ArrayList<View> views;
             viewHolder.img.setTag(list.get(position).get("ima"));
             try {
                 //downImage.loadImage(list.get(position).get("newUrl").toString())
-                new DownImageTask(viewHolder.img).execute(list.get(position).get("ima"));
+                new DownImageTask(viewHolder.img,true).execute(list.get(position).get("ima"));
 
             }
             catch (Exception e){e.printStackTrace();}
@@ -387,5 +415,7 @@ ArrayList<View> views;
 
     }
 }
+
+
 
 

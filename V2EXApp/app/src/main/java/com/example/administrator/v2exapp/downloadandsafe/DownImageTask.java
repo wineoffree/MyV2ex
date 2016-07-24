@@ -14,9 +14,10 @@ import java.io.OutputStream;
 public class DownImageTask extends AsyncTask<String, Integer, Bitmap> {
     private String imageUrl;
     private ImageView imageView;
-
-    public DownImageTask(ImageView imageView) {
+    private boolean ifAvoid;//判断是否需要防止错位
+    public DownImageTask(ImageView imageView,boolean ifAvoid) {
         this.imageView = imageView;
+        this.ifAvoid=ifAvoid;
     }
 
     @Override
@@ -24,7 +25,7 @@ public class DownImageTask extends AsyncTask<String, Integer, Bitmap> {
         Bitmap bitmap=null;
         imageUrl = params[0];
         try {
-           DownImage downImage=new DownImage(imageUrl);
+            DownImage downImage=new DownImage(imageUrl);
             bitmap=downImage.loadImage();
         }
         catch (Exception e){e.printStackTrace();
@@ -37,12 +38,15 @@ public class DownImageTask extends AsyncTask<String, Integer, Bitmap> {
     @Override
     protected void onPostExecute(Bitmap result) {
         super.onPostExecute(result);
-
-        if (result != null) {
-            // 通过 tag 来防止图片错位
-            if (imageView.getTag() != null && imageView.getTag().equals(imageUrl)) {
-                imageView.setImageBitmap(result);
-            }
+        if(ifAvoid){
+            if (result != null) {
+                // 通过 tag 来防止图片错位
+                if (imageView.getTag() != null && imageView.getTag().equals(imageUrl)) {
+                    imageView.setImageBitmap(result);
+                }
+            }}
+        else {
+            imageView.setImageBitmap(result);
         }
-}
+    }
 }
