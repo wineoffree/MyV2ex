@@ -18,12 +18,12 @@ public class DownImageTask extends AsyncTask<String, Integer, Bitmap> {
     private String imageUrl;
     private ImageView imageView;
     private boolean ifAvoid;//判断是否需要防止错位
-    private int position;
+
     private int index;
-    public DownImageTask(ImageView imageView,boolean ifAvoid,int position,int index) {
+    public DownImageTask(ImageView imageView,boolean ifAvoid,int index) {
         this.imageView = imageView;
         this.ifAvoid=ifAvoid;
-        this.position=position;
+
         this.index=index;
     }
 
@@ -62,28 +62,27 @@ public class DownImageTask extends AsyncTask<String, Integer, Bitmap> {
     @Override
     protected void onPostExecute(Bitmap result) {
         super.onPostExecute(result);
-        if(ifAvoid){
-            if (result != null) {
-                // 通过 tag 来防止图片错位
-                if (imageView.getTag() != null && imageView.getTag().equals(imageUrl)) {
-                    imageView.setImageBitmap(result);
-                }
-                try {
-                    //图片存入文件
-                    SaveToFile saveToFile=new SaveToFile(index);
-                    saveToFile.setBitmap(result);
-                    saveToFile.setpath(imageUrl.replaceAll("/","").replace(".png?m=","").replace("_",""));
-                    saveToFile.saveBitmap();
-                    //图片缓存
-                    CacheImage.putBitmap(imageUrl.replaceAll("/","").replace(".png?m=","").replace("_",""),result);
-                }
-                catch (Exception e){e.printStackTrace();}
-                Log.d("wiwiwi",result.toString());
 
-            }}
-        else {
+        if (result != null) {
+
             imageView.setImageBitmap(result);
-        }
 
-    }
+            try {
+                //图片缓存
+                CacheImage.putBitmap(imageUrl.replaceAll("/","").replace(".png?m=","").replace("_",""),result);
+                //图片存入文件
+                SaveToFile saveToFile=new SaveToFile(index);
+                saveToFile.setBitmap(result);
+                saveToFile.setpath(imageUrl.replaceAll("/","").replace(".png?m=","").replace("_",""));
+                saveToFile.saveBitmap();
+                //图片缓存
+                CacheImage.putBitmap(imageUrl.replaceAll("/","").replace(".png?m=","").replace("_",""),result);
+            }
+            catch (Exception e){e.printStackTrace();}
+            Log.d("wiwiwi",result.toString());
+
+        }}
+
+
 }
+

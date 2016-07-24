@@ -77,7 +77,7 @@ public class SecondTask extends AsyncTask<String, Integer, List<Map<String,Strin
             TextView name = (TextView)(view.findViewById(R.id.name));
             name.setText(result.get(i).get("name").toString());
             ImageView img = (ImageView)(view.findViewById(R.id.ima));
-            new DownImageTask(img,false,0,0).execute(result.get(i).get("ima"));
+            new DownImageTask(img,false,0).execute(result.get(i).get("ima"));
             linearLayout.addView(view);
         }
 

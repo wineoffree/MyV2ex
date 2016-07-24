@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
@@ -44,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
     int currentIndex=0;
     //记录选择的指示条和VIEW页面所在位置
     int selectIndex;
+    ArrayList<RadioButton>buttons=new ArrayList<RadioButton>();
     RadioButton btn1,btn2,btn3,btn4,btn5,btn6,btn7,btn8,btn9,btn10,btn11;
     HorizontalScrollView horizontalScrollView;
     // view数组
@@ -53,11 +55,11 @@ public class MainActivity extends AppCompatActivity {
     //listview
     ListView listView;
     //listview适配器
-    ListWithNetAdapter listWithNetAdapter;ListWithoutNetAdapter listWithoutNetAdapter;
+    ListWithNetAdapter listWithNetAdapter=null;ListWithoutNetAdapter listWithoutNetAdapter=null;
     //进度条
     ProgressDialog progressDialog;
     //是否有网
-    boolean ifHasNet;
+    boolean ifHasNet=false;
     //监听当前的 index
     int mainIndex=0;
     @Override
@@ -65,19 +67,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         CacheImage cacheImage=new CacheImage();
-        InitRadioButton();
+
         InitialPager();
+        InitRadioButton();
         MyPagerAdapter adapter = new MyPagerAdapter(viewList);
-        //刷新按钮
-        Button refresh=(Button) findViewById(R.id.refresh);
-        refresh.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                listWithNetAdapter = new ListWithNetAdapter(MainActivity.this,mainIndex);
-                FirstTask downloadTheLastTask = new FirstTask(progressDialog, listWithNetAdapter, listView, MainActivity.this, mainIndex);
-                downloadTheLastTask.execute();
-            }
-        });
+
+
         //设定viewPager适配器
         vp = (ViewPager)findViewById(R.id.viewpager);
         vp.setAdapter(adapter);
@@ -94,15 +89,34 @@ public class MainActivity extends AppCompatActivity {
         ifHasNet=isNetworkAvailable(MainActivity.this);
         if(ifHasNet){
             listWithNetAdapter = new ListWithNetAdapter(MainActivity.this, 0);
+            listView.setOnScrollListener(new myListViewlistener());
             FirstTask downloadTheLastTask = new FirstTask(progressDialog, listWithNetAdapter, listView, MainActivity.this, 0);
             downloadTheLastTask.execute();
         }
         else {
             listWithoutNetAdapter=new ListWithoutNetAdapter(MainActivity.this,0);
-            FileShowTask fileShowTask=new FileShowTask(progressDialog,listWithoutNetAdapter,listView,MainActivity.this,0);
+            FileShowTask fileShowTask=new  FileShowTask(progressDialog,listWithoutNetAdapter,listView,MainActivity.this,0);
             fileShowTask.execute();
         }
 
+        //刷新按钮
+        Button refresh=(Button) findViewById(R.id.refresh);
+        refresh.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ifHasNet=isNetworkAvailable(MainActivity.this);
+                if(ifHasNet){
+                    listWithNetAdapter = new ListWithNetAdapter(MainActivity.this,mainIndex);
+                    listView.setOnScrollListener(new myListViewlistener());
+                    FirstTask downloadTheLastTask = new FirstTask(progressDialog, listWithNetAdapter, listView, MainActivity.this, mainIndex);
+                    downloadTheLastTask.execute();}
+                else {
+                    listWithoutNetAdapter=new ListWithoutNetAdapter(MainActivity.this, mainIndex);
+                    FileShowTask fileShowTask=new  FileShowTask(progressDialog,listWithoutNetAdapter,listView,MainActivity.this, mainIndex);
+                    fileShowTask.execute();
+                }
+            }
+        });
     }
     //判断是否有网
     public boolean isNetworkAvailable(Activity activity)
@@ -160,20 +174,7 @@ public class MainActivity extends AppCompatActivity {
             btn11.setBackgroundColor(Color.rgb(211,211,211));}
 
     }
-    //判断文件是否存在
-    public boolean fileIsExists(int index){
-        try{
-            File f=new File(Environment.getExternalStorageDirectory().getAbsolutePath()+"/myv2ex"+"/save"+String.valueOf(index)+"content.txt");
-            if(!f.exists()){
-                return false;
-            }
 
-        }catch (Exception e) {
-            // TODO: handle exception
-            return false;
-        }
-        return true;
-    }
     //初始化button
     private void InitRadioButton() {
         horizontalScrollView=(HorizontalScrollView)findViewById(R.id.scrollView) ;
@@ -188,11 +189,14 @@ public class MainActivity extends AppCompatActivity {
                 vp.setCurrentItem(currentIndex-1);
                 listView=(ListView)viewList.get(0).findViewById(R.id.list);
                 listView.setOnItemClickListener(new MyListViewClicklistener());
+
                 ifHasNet=isNetworkAvailable(MainActivity.this);
                 if( ifHasNet){
                     listWithNetAdapter = new ListWithNetAdapter(MainActivity.this, 0);
+                    listView.setOnScrollListener(new myListViewlistener());
                     FirstTask downloadTheLastTask = new FirstTask(progressDialog, listWithNetAdapter, listView, MainActivity.this, 0);
                     downloadTheLastTask.execute();
+
                 }
                 else {
                     listWithoutNetAdapter=new ListWithoutNetAdapter(MainActivity.this,0);
@@ -212,12 +216,13 @@ public class MainActivity extends AppCompatActivity {
                 vp.setCurrentItem(currentIndex-1);
                 listView=(ListView)viewList.get(1).findViewById(R.id.list);
                 listView.setOnItemClickListener(new MyListViewClicklistener());
-
-                // ifHasNet=isNetworkAvailable(MainActivity.this);
+                ifHasNet=isNetworkAvailable(MainActivity.this);
                 if(ifHasNet){
                     listWithNetAdapter = new ListWithNetAdapter(MainActivity.this,1);
+                    listView.setOnScrollListener(new myListViewlistener());
                     FirstTask downloadTheLastTask = new FirstTask(progressDialog, listWithNetAdapter, listView, MainActivity.this, 1);
                     downloadTheLastTask.execute();
+
                 }
                 else {
                     listWithoutNetAdapter=new ListWithoutNetAdapter(MainActivity.this,1);
@@ -237,11 +242,14 @@ public class MainActivity extends AppCompatActivity {
                 vp.setCurrentItem(currentIndex-1);
                 listView=(ListView)viewList.get(2).findViewById(R.id.list);
                 listView.setOnItemClickListener(new MyListViewClicklistener());
-                //ifHasNet=isNetworkAvailable(MainActivity.this);
+                ifHasNet=isNetworkAvailable(MainActivity.this);
                 if(ifHasNet){
+
                     listWithNetAdapter = new ListWithNetAdapter(MainActivity.this, 2);
+                    listView.setOnScrollListener(new myListViewlistener());
                     FirstTask downloadTheLastTask = new FirstTask(progressDialog, listWithNetAdapter, listView, MainActivity.this, 2);
                     downloadTheLastTask.execute();
+
                 }
                 else { listWithoutNetAdapter=new ListWithoutNetAdapter(MainActivity.this,2);
                     FileShowTask fileShowTask=new  FileShowTask(progressDialog,listWithoutNetAdapter,listView,MainActivity.this,2);
@@ -262,7 +270,9 @@ public class MainActivity extends AppCompatActivity {
                 listView.setOnItemClickListener(new MyListViewClicklistener());
                 // ifHasNet=isNetworkAvailable(MainActivity.this);
                 if(ifHasNet){
+
                     listWithNetAdapter = new ListWithNetAdapter(MainActivity.this, 3);
+                    listView.setOnScrollListener(new myListViewlistener());
                     FirstTask downloadTheLastTask = new FirstTask(progressDialog, listWithNetAdapter, listView, MainActivity.this, 3);
                     downloadTheLastTask.execute();
                 }
@@ -284,9 +294,11 @@ public class MainActivity extends AppCompatActivity {
                 vp.setCurrentItem(currentIndex-1);
                 listView=(ListView)viewList.get(4).findViewById(R.id.list);
                 listView.setOnItemClickListener(new MyListViewClicklistener());
-                // ifHasNet=isNetworkAvailable(MainActivity.this);
+                ifHasNet=isNetworkAvailable(MainActivity.this);
                 if(ifHasNet){
+
                     listWithNetAdapter = new ListWithNetAdapter(MainActivity.this, 4);
+                    listView.setOnScrollListener(new myListViewlistener());
                     FirstTask downloadTheLastTask = new FirstTask(progressDialog, listWithNetAdapter, listView, MainActivity.this, 4);
                     downloadTheLastTask.execute();
                 }
@@ -308,9 +320,11 @@ public class MainActivity extends AppCompatActivity {
                 vp.setCurrentItem(currentIndex-1);
                 listView=(ListView)viewList.get(5).findViewById(R.id.list);
                 listView.setOnItemClickListener(new MyListViewClicklistener());
-                //ifHasNet=isNetworkAvailable(MainActivity.this);
+                ifHasNet=isNetworkAvailable(MainActivity.this);
                 if(ifHasNet){
+
                     listWithNetAdapter = new ListWithNetAdapter(MainActivity.this, 5);
+                    listView.setOnScrollListener(new myListViewlistener());
                     FirstTask downloadTheLastTask = new FirstTask(progressDialog, listWithNetAdapter, listView, MainActivity.this, 5);
                     downloadTheLastTask.execute();
                 }
@@ -332,9 +346,11 @@ public class MainActivity extends AppCompatActivity {
                 vp.setCurrentItem(currentIndex-1);
                 listView=(ListView)viewList.get(6).findViewById(R.id.list);
                 listView.setOnItemClickListener(new MyListViewClicklistener());
-                // ifHasNet=isNetworkAvailable(MainActivity.this);
+                ifHasNet=isNetworkAvailable(MainActivity.this);
                 if(ifHasNet){
+
                     listWithNetAdapter = new ListWithNetAdapter(MainActivity.this, 6);
+                    listView.setOnScrollListener(new myListViewlistener());
                     FirstTask downloadTheLastTask = new FirstTask(progressDialog, listWithNetAdapter, listView, MainActivity.this, 6);
                     downloadTheLastTask.execute();
                 }
@@ -356,9 +372,11 @@ public class MainActivity extends AppCompatActivity {
                 vp.setCurrentItem(currentIndex-1);
                 listView=(ListView)viewList.get(7).findViewById(R.id.list);
                 listView.setOnItemClickListener(new MyListViewClicklistener());
-                //ifHasNet=isNetworkAvailable(MainActivity.this);
+                ifHasNet=isNetworkAvailable(MainActivity.this);
                 if(ifHasNet){
+
                     listWithNetAdapter = new ListWithNetAdapter(MainActivity.this, 7);
+                    listView.setOnScrollListener(new myListViewlistener());
                     FirstTask downloadTheLastTask = new FirstTask(progressDialog, listWithNetAdapter, listView, MainActivity.this, 7);
                     downloadTheLastTask.execute();
                 }
@@ -380,9 +398,11 @@ public class MainActivity extends AppCompatActivity {
                 vp.setCurrentItem(currentIndex-1);
                 listView=(ListView)viewList.get(8).findViewById(R.id.list);
                 listView.setOnItemClickListener(new MyListViewClicklistener());
-                // ifHasNet=isNetworkAvailable(MainActivity.this);
+                ifHasNet=isNetworkAvailable(MainActivity.this);
                 if(ifHasNet){
+
                     listWithNetAdapter = new ListWithNetAdapter(MainActivity.this, 8);
+                    listView.setOnScrollListener(new myListViewlistener());
                     FirstTask downloadTheLastTask = new FirstTask(progressDialog, listWithNetAdapter, listView, MainActivity.this, 8);
                     downloadTheLastTask.execute();
                 }
@@ -404,9 +424,11 @@ public class MainActivity extends AppCompatActivity {
                 vp.setCurrentItem(currentIndex-1);
                 listView=(ListView)viewList.get(9).findViewById(R.id.list);
                 listView.setOnItemClickListener(new MyListViewClicklistener());
-                //ifHasNet=isNetworkAvailable(MainActivity.this);
+                ifHasNet=isNetworkAvailable(MainActivity.this);
                 if(ifHasNet){
+
                     listWithNetAdapter = new ListWithNetAdapter(MainActivity.this, 9);
+                    listView.setOnScrollListener(new myListViewlistener());
                     FirstTask downloadTheLastTask = new FirstTask(progressDialog, listWithNetAdapter, listView, MainActivity.this, 9);
                     downloadTheLastTask.execute();
                 }
@@ -428,9 +450,11 @@ public class MainActivity extends AppCompatActivity {
                 vp.setCurrentItem(currentIndex-1);
                 listView=(ListView)viewList.get(10).findViewById(R.id.list);
                 listView.setOnItemClickListener(new MyListViewClicklistener());
-                // ifHasNet=isNetworkAvailable(MainActivity.this);
+                ifHasNet=isNetworkAvailable(MainActivity.this);
                 if( ifHasNet){
+
                     listWithNetAdapter = new ListWithNetAdapter(MainActivity.this, 10);
+                    listView.setOnScrollListener(new myListViewlistener());
                     FirstTask downloadTheLastTask = new FirstTask(progressDialog, listWithNetAdapter, listView, MainActivity.this, 10);
                     downloadTheLastTask.execute();
                 }
@@ -447,8 +471,6 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
-
-
     //初始化viewpager
     public void InitialPager() {
         viewList = new ArrayList<View>();// 将要分页显示的View装入数组中
@@ -460,6 +482,69 @@ public class MainActivity extends AppCompatActivity {
         }
         listView=(ListView)  viewList.get(0).findViewById(R.id.list);
         listView.setOnItemClickListener(new MyListViewClicklistener());
+
+    }
+    //自定义listview滚动监听
+    public class myListViewlistener implements AbsListView.OnScrollListener {
+        @Override
+        public void onScrollStateChanged(AbsListView absListView, int scrollState) {
+            if(ifHasNet) {
+                switch (scrollState) {
+
+                    case AbsListView.OnScrollListener.SCROLL_STATE_IDLE://停止滚动
+                    {   try {
+                        //设置为停止滚动
+                        listWithNetAdapter.setScrollState(false);
+                    }
+                    catch (Exception e){e.printStackTrace();}
+                        //当前屏幕中listview的子项的个数
+                        int count = absListView.getChildCount();
+                        Log.e("MainActivity", count + "");
+
+                        for (int i = 0; i < count; i++) {
+
+                            //获取到item的头像
+                            ImageView ima = (ImageView) absListView.getChildAt(i).findViewById(R.id.ima);
+
+
+                            if (!ima.getTag().equals("1")) {//!="1"说明需要加载数据
+                                String image_url = ima.getTag().toString();//直接从Tag中取出我们存储的数据image——url
+                                new DownImageTask(ima, true, mainIndex).execute(image_url);
+                                ima.setTag("1");//设置为已加载过数据
+                            }
+                        }
+                        break;
+                    }
+                    case AbsListView.OnScrollListener.SCROLL_STATE_FLING://滚动做出了抛的动作
+                    {
+                        //设置为正在滚动
+                        try {
+                            listWithNetAdapter.setScrollState(true);
+
+                        }
+                        catch (Exception e){e.printStackTrace();}
+                        break;
+                    }
+
+                    case AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL://正在滚动
+                    { try {
+                        //设置为正在滚动
+                        listWithNetAdapter.setScrollState(true);
+
+                    }
+                    catch (Exception e){e.printStackTrace();}
+                        break;
+                    }
+                }
+
+            }
+
+        }
+
+        @Override
+        public void onScroll(AbsListView absListView, int i, int i1, int i2) {
+
+        }
     }
     //viewpager的页面改变监听器
     public class MyPageChangeListener implements ViewPager.OnPageChangeListener {
@@ -488,7 +573,6 @@ public class MainActivity extends AppCompatActivity {
         public void onPageScrollStateChanged(int arg0) {
         }
     }
-
     //listview items监听器
     class MyListViewClicklistener implements AdapterView.OnItemClickListener{
         @Override
@@ -509,7 +593,6 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         }
     }
-    //页面listview适配器
 
 
 

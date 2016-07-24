@@ -26,7 +26,9 @@ public class ListWithNetAdapter extends BaseAdapter {
     private Context context;
     private LayoutInflater layoutInflater;
     private List<Map<String,String>> list;
-     int index;
+    int index;
+    //定义当前listview是否在滑动状态
+    private  boolean scrollState=false;
     public ListWithNetAdapter(Context context,int index) {
         this.index=index;
         this.context = context;
@@ -40,6 +42,9 @@ public class ListWithNetAdapter extends BaseAdapter {
         this.list = data;
     }
 
+    public void setScrollState(boolean scrollState) {
+        this.scrollState = scrollState;
+    }
     @Override
     public int getCount() {
         return list.size();
@@ -86,13 +91,19 @@ public class ListWithNetAdapter extends BaseAdapter {
         viewHolder.showId.setText(list.get(position).get("showId").toString());
         DownImage downImage;
         viewHolder.newUrl=list.get(position).get("newUrl").toString();
-        //给img设置tag防止错位
-        viewHolder.img.setTag(list.get(position).get("ima"));
-        try {
-            //downImage.loadImage(list.get(position).get("newUrl").toString())
-            new DownImageTask(viewHolder.img,true,position,index).execute(list.get(position).get("ima"));
+
+        if (!scrollState){
+            //加载图片
+            new DownImageTask(viewHolder.img,true,index).execute(list.get(position).get("ima"));
+            //设置tag为1表示已加载过数据
+            viewHolder.img.setTag("1");
+        }else{
+            viewHolder.img.setTag(list.get(position).get("ima"));
+            //默认图片
+            viewHolder.img.setImageResource(R.drawable.unload);
         }
-        catch (Exception e){e.printStackTrace();}
+
+
 
         return convertView;
     }
