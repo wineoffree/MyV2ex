@@ -23,6 +23,8 @@ public class MyDrawerLayout extends DrawerLayout{
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
+        if(SortPagerFragment.ifCancelOntouch)
+            return true;
         return super.dispatchTouchEvent(ev);
     }
 }

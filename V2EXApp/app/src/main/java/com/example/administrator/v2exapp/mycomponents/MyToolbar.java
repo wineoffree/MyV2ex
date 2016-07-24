@@ -23,6 +23,8 @@ public class MyToolbar extends Toolbar{
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
+        if(SortPagerFragment.ifCancelOntouch)
+            return true;
         return super.dispatchTouchEvent(ev);
     }
 }

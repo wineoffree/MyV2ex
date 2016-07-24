@@ -158,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
                 getFragmentManager().beginTransaction()
                         .replace(R.id.frage, fragment)
                         .commit();
-
+                SortPagerFragment.ifCancelOntouch=true;
             }
         });
     }

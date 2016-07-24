@@ -76,6 +76,7 @@ public class SortPagerFragment extends Fragment {
                 catch (Exception e){e.printStackTrace();}
                 SaveConfigureTask saveConfigureTask=new SaveConfigureTask(jsonArray.toString(),mainActivity.handler);
                 saveConfigureTask.execute();
+                ifCancelOntouch=false;
                 getFragmentManager().beginTransaction()
                         .remove(SortPagerFragment.this)
                         .commit();
@@ -89,6 +90,7 @@ public class SortPagerFragment extends Fragment {
                 getFragmentManager().beginTransaction()
                         .remove(SortPagerFragment.this)
                         .commit();
+                ifCancelOntouch=false;
             }
         });
         return view;
