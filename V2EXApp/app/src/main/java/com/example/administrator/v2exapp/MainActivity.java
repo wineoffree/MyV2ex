@@ -72,6 +72,12 @@ public class MainActivity extends AppCompatActivity {
     Button delete,sortpager;
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
+    //手势
+    GestureDetector mDetector;
+    // 标记手势是否滑动
+    private boolean Flag = false;
+    //
+    private int firstItem=0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -108,8 +114,45 @@ public class MainActivity extends AppCompatActivity {
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, R.string.app_name, R.string.app_name) ;
         mDrawerToggle.syncState();
         mDrawerLayout.addDrawerListener(mDrawerToggle);
-    }
+        mDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
+            @Override
+            public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+                // 手势向下 down
+                if ((e2.getRawY() - e1.getRawY()) > 300&&velocityY > 1500) {
+                    if (firstItem==0){
+                        ifHasNet=isNetworkAvailable(MainActivity.this);
+                        if(ifHasNet){
+                            listWithNetAdapter = new ListWithNetAdapter(MainActivity.this,mainIndex);
+                            listView.setOnScrollListener(new myListViewlistener());
+                            FirstTask downloadTheLastTask = new FirstTask(progressDialog, listWithNetAdapter, listView, MainActivity.this, mainIndex);
+                            downloadTheLastTask.execute();}
+                        else {
+                            listWithoutNetAdapter=new ListWithoutNetAdapter(MainActivity.this, mainIndex);
+                            FileShowTask fileShowTask=new  FileShowTask(progressDialog,listWithoutNetAdapter,listView,MainActivity.this, mainIndex);
+                            fileShowTask.execute();
+                        }
+                    }
 
+                }
+                return super.onFling(e1, e2, velocityX, velocityY);
+            }
+        });
+    }
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        //TouchEvent dispatcher.
+        if (mDetector != null) {
+            if (mDetector.onTouchEvent(ev))
+                //If the gestureDetector handles the event, a swipe has been executed and no more needs to be done.
+                return true;
+        }
+        return super.dispatchTouchEvent(ev);
+    }
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        mDetector.onTouchEvent(event);
+        return super.onTouchEvent(event);
+    }
 
     //menu布局
     public boolean onCreateOptionsMenu(Menu menu)
@@ -355,7 +398,7 @@ public class MainActivity extends AppCompatActivity {
                     catch (Exception e){e.printStackTrace();}
                         //当前屏幕中listview的子项的个数
                         int count = absListView.getChildCount();
-                        Log.e("MainActivity", count + "");
+                        firstItem=absListView.getFirstVisiblePosition();
                         for (int i = 0; i < count; i++) {
 
                             //获取到item的头像
@@ -363,7 +406,6 @@ public class MainActivity extends AppCompatActivity {
 
 
                             if (!ima.getTag().equals("1")) {//!="1"说明需要加载数据
-                                Log.d("imamamama",ima.toString());
                                 String image_url = ima.getTag().toString();//直接从Tag中取出我们存储的数据image——url
                                 new DownImageTask(ima).execute(image_url);
                                 ima.setTag("1");//设置为已加载过数据
