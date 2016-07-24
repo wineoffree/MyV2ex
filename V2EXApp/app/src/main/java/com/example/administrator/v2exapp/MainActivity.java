@@ -4,28 +4,41 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.gesture.GestureOverlayView;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RadioButton;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.administrator.v2exapp.listadapter.ListWithNetAdapter;
 import com.example.administrator.v2exapp.listadapter.ListWithoutNetAdapter;
 import com.example.administrator.v2exapp.listadapter.MyPagerAdapter;
 import com.example.administrator.v2exapp.netspider.FirstTask;
 import com.example.administrator.v2exapp.save.FileShowTask;
+import com.example.administrator.v2exapp.save.SaveToFile;
 import com.example.administrator.v2exapp.search.SearchChooseActivity;
 import com.example.netlibrary.CacheImage;
 import com.example.netlibrary.DownImageTask;
@@ -37,8 +50,6 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
     //记录当前指示条和VIEW页面所在位置
     int currentIndex=0;
-    //记录选择的指示条和VIEW页面所在位置
-    int selectIndex;
     ArrayList<RadioButton> buttons=new ArrayList<RadioButton>();
     RadioButton btn1,btn2,btn3,btn4,btn5,btn6,btn7,btn8,btn9,btn10,btn11;
     HorizontalScrollView horizontalScrollView;
@@ -56,6 +67,11 @@ public class MainActivity extends AppCompatActivity {
     boolean ifHasNet=false;
     //监听当前的 index
     int mainIndex=0;
+    private Toolbar toolbar;
+    //drawer里面按钮
+    Button delete,sortpager;
+    private DrawerLayout mDrawerLayout;
+    private ActionBarDrawerToggle mDrawerToggle;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,20 +100,41 @@ public class MainActivity extends AppCompatActivity {
             FileShowTask fileShowTask=new  FileShowTask(progressDialog,listWithoutNetAdapter,listView,MainActivity.this,0);
             fileShowTask.execute();
         }
-        //搜索按钮
-        ImageButton search=(ImageButton) findViewById(R.id.search);
-        search.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        toolbar = (Toolbar)findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setHomeButtonEnabled(true); //设置返回键可用
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        mDrawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
+        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, R.string.app_name, R.string.app_name) ;
+        mDrawerToggle.syncState();
+        mDrawerLayout.addDrawerListener(mDrawerToggle);
+    }
+
+
+    //menu布局
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        MenuInflater inflator = new MenuInflater(this);
+        //装填R.menu.my_menu对应的菜单，并添加到menu中
+        inflator.inflate(R.menu.menu_main, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+    // 菜单项被单击后的回调方法
+    public boolean onOptionsItemSelected(MenuItem mi)
+    {
+        if(mi.isCheckable())
+        {
+            // 勾选该菜单项
+            mi.setChecked(true);  // ②
+        }
+        //判断单击的是哪个菜单项，并有针对性地作出响应
+        switch (mi.getItemId())
+        {
+            case R.id.search:
                 Intent intent=new Intent(MainActivity.this,SearchChooseActivity.class);
                 startActivity(intent);
-            }
-        });
-        //刷新按钮
-        ImageButton refresh=(ImageButton) findViewById(R.id.refresh);
-        refresh.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+                break;
+            case R.id.refresh:
                 ifHasNet=isNetworkAvailable(MainActivity.this);
                 if(ifHasNet){
                     listWithNetAdapter = new ListWithNetAdapter(MainActivity.this,mainIndex);
@@ -109,8 +146,9 @@ public class MainActivity extends AppCompatActivity {
                     FileShowTask fileShowTask=new  FileShowTask(progressDialog,listWithoutNetAdapter,listView,MainActivity.this, mainIndex);
                     fileShowTask.execute();
                 }
-            }
-        });
+                break;
+        }
+        return true;
     }
     //判断是否有网
     public boolean isNetworkAvailable(Activity activity)
@@ -191,6 +229,7 @@ public class MainActivity extends AppCompatActivity {
     }
     //初始化button
     private void InitRadioButton() {
+
         horizontalScrollView=(HorizontalScrollView)findViewById(R.id.scrollView) ;
         btn1 = (RadioButton) findViewById(R.id.btn1);
         btn1.setOnClickListener(new View.OnClickListener() {
@@ -294,10 +333,14 @@ public class MainActivity extends AppCompatActivity {
         }
         listView=(ListView)  viewList.get(0).findViewById(R.id.list);
         listView.setOnItemClickListener(new MyListViewClicklistener());
-
+        listView.setLongClickable(true);
     }
     //自定义listview滚动监听
-    public class myListViewlistener implements AbsListView.OnScrollListener {
+    public class myListViewlistener implements AbsListView.OnScrollListener
+    {
+
+        // 标记上次滑动位置
+        private int lastPosition;
         @Override
         public void onScrollStateChanged(AbsListView absListView, int scrollState) {
             if(ifHasNet) {
@@ -305,6 +348,7 @@ public class MainActivity extends AppCompatActivity {
 
                     case AbsListView.OnScrollListener.SCROLL_STATE_IDLE://停止滚动
                     {   try {
+
                         //设置为停止滚动
                         listWithNetAdapter.setScrollState(false);
                     }
@@ -312,7 +356,6 @@ public class MainActivity extends AppCompatActivity {
                         //当前屏幕中listview的子项的个数
                         int count = absListView.getChildCount();
                         Log.e("MainActivity", count + "");
-
                         for (int i = 0; i < count; i++) {
 
                             //获取到item的头像
@@ -332,6 +375,7 @@ public class MainActivity extends AppCompatActivity {
                     {
                         //设置为正在滚动
                         try {
+
                             listWithNetAdapter.setScrollState(true);
 
                         }
@@ -341,6 +385,7 @@ public class MainActivity extends AppCompatActivity {
 
                     case AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL://正在滚动
                     { try {
+
                         //设置为正在滚动
                         listWithNetAdapter.setScrollState(true);
 
@@ -355,7 +400,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onScroll(AbsListView absListView, int i, int i1, int i2) {
+        public void onScroll(AbsListView absListView, int firstVisibleItem,int visibleItemCount, int totalItemCount) {
+
 
         }
     }
