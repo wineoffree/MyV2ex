@@ -7,20 +7,24 @@ import java.io.Serializable;
  * Created by Administrator on 2016/7/12.
  */
 public class Date  implements Serializable{
-    private String url;
+    private String newUrl;
     private String name;
     private String type;
     private String showId;
     private String time;
     private String content;
+    private int index;
+    private String url;
     //private Bitmap ima;
-    public Date(String url,String name,String type,String showId,String time,String content){
-        this.url=url;
+    public Date(String newUrl,String name,String type,String showId,String time,String content,int index,String url){
+        this.newUrl=newUrl;
         this.name=name;
         this.type=type;
         this.showId=showId;
         this.time=time;
         this.content=content;
+        this.index=index;
+        this.url=url;
         //this.ima=bitmap;
     }
 
@@ -47,6 +51,7 @@ public class Date  implements Serializable{
     public String getUrl() {
         return url;
     }
-
+    public int getIndex(){return index;}
+    public String getNewUrl(){return newUrl;}
 }
 

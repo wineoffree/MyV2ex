@@ -2,16 +2,14 @@ package com.example.administrator.v2exapp.netspider;
 
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.ListView;
 
 import com.example.administrator.v2exapp.MainActivity;
-import com.example.administrator.v2exapp.ViewHolder;
-import com.example.administrator.v2exapp.listadapter.MyPagerAdapter;
-
-import org.json.JSONObject;
+import com.example.administrator.v2exapp.listadapter.ListWithNetAdapter;
+import com.example.administrator.v2exapp.save.SaveTask;
+import com.example.administrator.v2exapp.save.SaveToFile;
 
 import java.util.List;
 import java.util.Map;
@@ -22,12 +20,13 @@ import java.util.Map;
  */
 public class FirstTask extends AsyncTask<String, Integer, List<Map<String,String>>> {
     ProgressDialog progressDialog;
-    MainActivity.ListWithNetAdapter adapter;
+    ListWithNetAdapter adapter;
     ListView listView;//下拉框
     Context context;
     int i;
     int index;
-    public FirstTask(ProgressDialog progressDialog, MainActivity.ListWithNetAdapter adapter, ListView listView, Context context, int index){
+    String content;
+    public FirstTask(ProgressDialog progressDialog, ListWithNetAdapter adapter, ListView listView, Context context, int index){
         this.progressDialog=progressDialog;
         this.adapter=adapter;
         this.listView=listView;
@@ -36,6 +35,7 @@ public class FirstTask extends AsyncTask<String, Integer, List<Map<String,String
     }
     @Override
     protected void onPreExecute() {
+        Log.d("wiwiwi","ewedasdasdas");
         // TODO Auto-generated method stub
         super.onPreExecute();
         progressDialog.show();
@@ -44,16 +44,13 @@ public class FirstTask extends AsyncTask<String, Integer, List<Map<String,String
     @Override
     protected void onPostExecute(List<Map<String, String>> result) {
         // TODO Auto-generated method stub
-
         super.onPostExecute(result);
-
         adapter.setData(result);
-        Log.d("haha","6666666");
-        Log.d("haha",result.toString());
         listView.setAdapter(adapter);
-        Log.d("haha","77777777");
         adapter.notifyDataSetChanged();
         progressDialog.dismiss();
+        SaveTask saveTask=new SaveTask(index,content);
+        saveTask.execute();
     }
 
     @Override
@@ -62,6 +59,7 @@ public class FirstTask extends AsyncTask<String, Integer, List<Map<String,String
         DrawDate drawDate=new DrawDate(index);
         drawDate.connectFirst();
         list=drawDate.getRequestList();
+        content=drawDate.content;
         return list;
     }
 }

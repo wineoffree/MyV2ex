@@ -2,6 +2,8 @@ package com.example.administrator.v2exapp.netspider;
 
 import android.util.Log;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -18,13 +20,14 @@ import java.util.Map;
 public class DrawDate {
     String url="http://www.v2ex.com/";
 
-    String[] slector={"?tab=tech","?tab=creative","?tab=play","?tab=apple"
-            ,"?tab=jobs","?tab=deals","?tab=city","?tab=qna","?tab=hot","?tab=all","?tab=r2"};
+    String[] slector={"?tab=all","?tab=creative","?tab=play","?tab=apple"
+            ,"?tab=jobs","?tab=deals","?tab=city","?tab=qna","?tab=hot","?tab=tech","?tab=r2"};
     String secondUrl;
     Document doc;
     Elements dates;
     int index;
-
+    //用来存储存入文件内容
+    String content=null;
 
     public DrawDate(int index){
         this.index=index;
@@ -51,32 +54,34 @@ public class DrawDate {
 
     //设置list
     public  void setList(List<Map<String ,String>> list){
+        JSONArray jsonArray=new JSONArray();
         try {
 
             dates=doc.select("div[id~=^Wrapper$]").select("div[class~=^cell item$]");
             for (Element date : dates) {
+                JSONObject jsonObject=new JSONObject();
                 Map<String ,String> map = new HashMap<String, String>();
                 String ima =date.select("img[src~=^//cdn.v2ex.co/avatar/.+]").attr("src");
-                map.put("ima",ima);
+                map.put("ima",ima);jsonObject.put("imaUrl",ima);
                 String newUrl =date.select("span[class~=^item_title$]").select("a").attr("abs:href");
-                map.put("newUrl",newUrl);
+                map.put("newUrl",newUrl);jsonObject.put("newUrl",newUrl);
                 String content =date.select("span[class~=^item_title$]").select("a").text();
-                map.put("content",content);
+                map.put("content",content); jsonObject.put("content",content);
                 String name =date.select("span[class~=^small fade$]").select("strong").first().select("a").text();
-                map.put("name",name);
+                map.put("name",name); jsonObject.put("name",name);
                 String type =date.select("span[class~=^small fade$]").select("a").first().text();
-                map.put("type",type);
+                map.put("type",type);  jsonObject.put("type",type);
                 String time =date.select("span[class~=^small fade$]").select(":contains(分钟前)").text();
-                Log.d("haha","type");
-                map.put("time",time );
+                map.put("time",time );  jsonObject.put("time",time );
                 String showId=date.select("td[align~=^right$]").select("a").text();
-                map.put("showId",showId);
+                map.put("showId",showId);    jsonObject.put("showId",showId);
+                jsonArray.put(jsonObject);
                 list.add(map);
             }
         }
         catch (Exception e){e.printStackTrace();}
         // Log.d("haha",dates.toString());
-
+        content=jsonArray.toString();
     }
     //设置第二层topic_content
     public String getTopicContent(){
@@ -95,10 +100,12 @@ public class DrawDate {
     }
     //设置第二层list
     public  void setSecondList(List<Map<String,String>> list){
+
         try {
             Elements as=doc.select("div[id~=^Wrapper$]").select("div[id~=^r_.+]");
 
             for (Element date : as) {
+
                 Map<String ,String> map = new HashMap<String, String>();
                 String ima =date.select("img[src~=^//cdn.v2ex.co/.+]").attr("src");
                 map.put("ima",ima);
@@ -112,6 +119,7 @@ public class DrawDate {
                 Log.d("haha123",time);
                 list.add(map);
             }
+
         }
         catch (Exception e){e.printStackTrace();}
         // Log.d("haha",dates.toString());

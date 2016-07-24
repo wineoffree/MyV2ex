@@ -1,9 +1,7 @@
-package com.example.administrator.v2exapp.downloadandsafe;
+package com.example.administrator.v2exapp.downloadimg;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.Handler;
-import android.os.Message;
 
 import java.io.IOException;
 import java.io.InputStream;

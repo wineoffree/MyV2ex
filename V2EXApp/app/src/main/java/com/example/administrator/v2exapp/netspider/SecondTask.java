@@ -3,7 +3,9 @@ package com.example.administrator.v2exapp.netspider;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
+import android.os.Environment;
 import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,7 +15,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.administrator.v2exapp.R;
-import com.example.administrator.v2exapp.downloadandsafe.DownImageTask;
+import com.example.administrator.v2exapp.downloadimg.DownImageTask;
+import com.example.administrator.v2exapp.save.CacheImage;
+import com.example.administrator.v2exapp.save.DateFromFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,13 +35,21 @@ public class SecondTask extends AsyncTask<String, Integer, List<Map<String,Strin
     String url;
     String topicContent;
     TextView textView;
-   ArrayList<View>views=new ArrayList<View>();
-    public SecondTask(ProgressDialog progressDialog ,Context context, String url, TextView textView,LinearLayout linearLayout){
+    DateFromFile dateFromFile;
+    int index;
+    String imaUrl;
+    ImageView imageView;
+    Bitmap bitmap;
+    ArrayList<View>views=new ArrayList<View>();
+    public SecondTask(ProgressDialog progressDialog ,Context context, String url, TextView textView,LinearLayout linearLayout,int index,String imaUrl,ImageView imageView){
         this.progressDialog=progressDialog;
         this.context=context;
         this.url=url;
         this.textView=textView;
         this.linearLayout=linearLayout;
+        this.index=index;
+        this.imaUrl=imaUrl;
+        this.imageView=imageView;
     }
     @Override
     protected void onPreExecute() {
@@ -51,6 +63,7 @@ public class SecondTask extends AsyncTask<String, Integer, List<Map<String,Strin
         // TODO Auto-generated method stub
 
         super.onPostExecute(result);
+        imageView.setImageBitmap(bitmap);
         Log.d("hahaha","show:615156");
         textView.setText(Html.fromHtml(topicContent));
         LinearLayout layout = new LinearLayout(context);
@@ -64,7 +77,7 @@ public class SecondTask extends AsyncTask<String, Integer, List<Map<String,Strin
             TextView name = (TextView)(view.findViewById(R.id.name));
             name.setText(result.get(i).get("name").toString());
             ImageView img = (ImageView)(view.findViewById(R.id.ima));
-            new DownImageTask(img,false).execute(result.get(i).get("ima"));
+            new DownImageTask(img,false,0,0).execute(result.get(i).get("ima"));
             linearLayout.addView(view);
         }
 
@@ -73,12 +86,18 @@ public class SecondTask extends AsyncTask<String, Integer, List<Map<String,Strin
 
     @Override
     protected List<Map<String,String>> doInBackground(String... params) {
+        //通过内存找
+        Bitmap abitmap = CacheImage.getBitmap(imaUrl.replaceAll("/","").replace(".png?m=","").replace("_",""));
+        if(abitmap!=null)
+            this.bitmap=abitmap;
+        else {//通过文件找
+            this.bitmap= BitmapFactory.decodeFile(Environment.getExternalStorageDirectory().getAbsolutePath()+"/myv2ex/"+imaUrl.replaceAll("/","").replace(".png?m=","").replace("_","")+".png");
+        }
         List<Map<String,String>> list=null;
         DrawDate drawDate=new DrawDate(url);
         drawDate.connectSecond();
         topicContent= drawDate.getTopicContent();
         list=drawDate.getSecondRequestList();
-        Log.d("haha123",list.toString());
         return list;
     }
 }
