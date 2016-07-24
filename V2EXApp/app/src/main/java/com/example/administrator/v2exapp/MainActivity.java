@@ -64,7 +64,6 @@ public class MainActivity extends AppCompatActivity {
     //进度条
     ProgressBar progressBar;
     ProgressBar reProgressBar;
-    ProgressDialog progressDialog;
     //是否有网
     boolean ifHasNet=false;
     //监听当前的 index
@@ -76,6 +75,8 @@ public class MainActivity extends AppCompatActivity {
     private ActionBarDrawerToggle mDrawerToggle;
     //进度条初始位置 上次位置
     float originY;
+    //屏蔽判断
+    boolean ifCancelOntouch;
     SortPagerFragment fragment;
 
     @Override
@@ -115,6 +116,8 @@ public class MainActivity extends AppCompatActivity {
         }
         toolbar = (MyToolbar)findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        toolbar.setTitle("浏览");
         drawOnclick();
         getSupportActionBar().setHomeButtonEnabled(true); //设置返回键可用
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -122,6 +125,7 @@ public class MainActivity extends AppCompatActivity {
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, R.string.app_name, R.string.app_name) ;
         mDrawerToggle.syncState();
         mDrawerLayout.addDrawerListener(mDrawerToggle);
+        ifCancelOntouch=false;
         handler = new Handler(){
 
             @Override
@@ -139,7 +143,7 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(MainActivity.this, MainActivity.class);
         startActivity(intent);
     }
-    //drawer中点击事件
+    //drawerLayout中点击事件
     public void drawOnclick(){
         delete=(Button)findViewById(R.id.delete);
         sortpager=(Button)findViewById(R.id.sortpager);
@@ -169,6 +173,38 @@ public class MainActivity extends AppCompatActivity {
         //装填R.menu.my_menu对应的菜单，并添加到menu中
         inflator.inflate(R.menu.menu_main, menu);
         return super.onCreateOptionsMenu(menu);
+    }
+    //自定义TAB按钮点击事件
+    public class MyOnClickListener implements View.OnClickListener {
+        int i;
+        public MyOnClickListener(int i){
+            this.i=i;
+        }
+        @Override
+        public void onClick(View view) {
+            if(currentIndex!=i){
+                radioButtons.get(i).setTextColor(Color.rgb(0,0,0));
+                radioButtons.get(i).setBackgroundColor(Color.rgb(248,248,255));
+                mainIndex=Integer.parseInt(valueList.get(i));
+                radioButtons.get(currentIndex).setTextColor(Color.rgb(248,248,255));
+                radioButtons.get(currentIndex).setBackgroundColor(Color.rgb(211,211,211));
+                currentIndex=i;
+                viewPagerp.setCurrentItem(currentIndex);
+                listView=(RefreshListview) viewList.get(i).findViewById(R.id.list);
+                listView.initial(originY,progressBar,reProgressBar,mainIndex);
+                listView.setOnItemClickListener(new MyListViewClicklistener());
+                ifHasNet=isNetworkAvailable(MainActivity.this);
+                if(ifHasNet){
+                    ListWithNetAdapter listWithNetAdapter2=new ListWithNetAdapter(MainActivity.this,i);
+                    FirstTask downloadTheLastTask = new FirstTask(progressBar, listWithNetAdapter2,listWithNetAdapter, listView, MainActivity.this,mainIndex);
+                    downloadTheLastTask.execute();
+                }
+                else {
+                    listWithoutNetAdapter=new ListWithoutNetAdapter(MainActivity.this,i);
+                    FileShowTask fileShowTask=new  FileShowTask(progressBar,listWithoutNetAdapter,listView,MainActivity.this,mainIndex);
+                    fileShowTask.execute();
+                }}
+        }
     }
     // 菜单项被单击后的回调方法
     public boolean onOptionsItemSelected(MenuItem mi)
@@ -209,7 +245,6 @@ public class MainActivity extends AppCompatActivity {
         Context context = activity.getApplicationContext();
         // 获取手机所有连接管理对象（包括对wi-fi,net等连接的管理）
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-
         if (connectivityManager == null)
         {
             return false;
@@ -218,7 +253,6 @@ public class MainActivity extends AppCompatActivity {
         {
             // 获取NetworkInfo对象
             NetworkInfo[] networkInfo = connectivityManager.getAllNetworkInfo();
-
             if (networkInfo != null && networkInfo.length > 0)
             {
                 for (int i = 0; i < networkInfo.length; i++)
@@ -232,53 +266,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         return false;
-    }
-    //恢复原有按钮颜色
-    public void setColor(int index){
-        if(index==0){btn1.setTextColor(Color.rgb(248,248,255));
-            btn1.setBackgroundColor(Color.rgb(211,211,211));}
-        if(index==1){btn2.setTextColor(Color.rgb(248,248,255));
-            btn2.setBackgroundColor(Color.rgb(211,211,211));}
-        if(index==2){btn3.setTextColor(Color.rgb(248,248,255));
-            btn3.setBackgroundColor(Color.rgb(211,211,211));}
-        if(index==3){btn4.setTextColor(Color.rgb(248,248,255));
-            btn4.setBackgroundColor(Color.rgb(211,211,211));}
-        if(index==4){btn5.setTextColor(Color.rgb(248,248,255));
-            btn5.setBackgroundColor(Color.rgb(211,211,211));}
-        if(index==5){btn6.setTextColor(Color.rgb(248,248,255));
-            btn6.setBackgroundColor(Color.rgb(211,211,211));}
-        if(index==6){btn7.setTextColor(Color.rgb(248,248,255));
-            btn7.setBackgroundColor(Color.rgb(211,211,211));}
-        if(index==7){btn8.setTextColor(Color.rgb(248,248,255));
-            btn8.setBackgroundColor(Color.rgb(211,211,211));}
-        if(index==8){btn9.setTextColor(Color.rgb(248,248,255));
-            btn9.setBackgroundColor(Color.rgb(211,211,211));}
-        if(index==9){btn10.setTextColor(Color.rgb(248,248,255));
-            btn10.setBackgroundColor(Color.rgb(211,211,211));}
-        if(index==10){btn11.setTextColor(Color.rgb(248,248,255));
-            btn11.setBackgroundColor(Color.rgb(211,211,211));}
-    }
-    //设置buttons点击事件
-    public void onButtons(int i,int value){
-        mainIndex=value;
-        setColor(currentIndex);
-        currentIndex=i;
-        viewPagerp.setCurrentItem(currentIndex);
-        listView=(RefreshListview) viewList.get(i).findViewById(R.id.list);
-        listView.initial(originY,progressBar,reProgressBar,mainIndex);
-        listView.setOnItemClickListener(new MyListViewClicklistener());
-        ifHasNet=isNetworkAvailable(MainActivity.this);
-        if(ifHasNet){
-            ListWithNetAdapter listWithNetAdapter2=new ListWithNetAdapter(MainActivity.this,i);
-            FirstTask downloadTheLastTask = new FirstTask(progressBar, listWithNetAdapter2,listWithNetAdapter, listView, MainActivity.this,mainIndex);
-            downloadTheLastTask.execute();
-        }
-        else {
-            listWithoutNetAdapter=new ListWithoutNetAdapter(MainActivity.this,i);
-            FileShowTask fileShowTask=new  FileShowTask(progressBar,listWithoutNetAdapter,listView,MainActivity.this,mainIndex);
-            fileShowTask.execute();
-        }
-        Log.d("pipi",String.valueOf(currentIndex));
     }
     //初始化button
     private void InitRadioButton() {
@@ -328,17 +315,7 @@ public class MainActivity extends AppCompatActivity {
         public void onPageSelected(int arg0) {
             listWithNetAdapter.setIfFinishDownload(false);
             reProgressBar.clearAnimation();
-            if(arg0==0){btn1.performClick();horizontalScrollView.scrollTo(0,0);}
-            if(arg0==1){btn2.performClick();horizontalScrollView.scrollTo(0,0);}
-            if(arg0==2){btn3.performClick();horizontalScrollView.scrollTo(0,0);}
-            if(arg0==3){btn4.performClick();horizontalScrollView.scrollTo(0,0);}
-            if(arg0==4){btn5.performClick();horizontalScrollView.scrollTo(150,0);}
-            if(arg0==5){btn6.performClick();horizontalScrollView.scrollTo(250,0);}
-            if(arg0==6){btn7.performClick();horizontalScrollView.scrollTo(350,0);}
-            if(arg0==7){btn8.performClick();horizontalScrollView.scrollTo(450,0);}
-            if(arg0==8){btn9.performClick();horizontalScrollView.scrollTo(550,0);}
-            if(arg0==9){btn10.performClick();horizontalScrollView.scrollTo(800,0);}
-            if(arg0==10){btn11.performClick();horizontalScrollView.scrollTo(800,0);}
+            radioButtons.get(arg0).performClick();horizontalScrollView.scrollTo((arg0-3)*150,0);
         }
         @Override
         public void onPageScrolled(int arg0, float arg1, int arg2) {
@@ -385,93 +362,15 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(List<Map<String, String>> result) {
             if (tabList==null){
-                Log.d("pipi","haha");
                 tabList=result;}
             valueList=new ArrayList<String>();
             for(int i=0;i<tabList.size();i++){
                 radioButtons.get(i).setText(tabList.get(i).get("tab"));
                 valueList.add(tabList.get(i).get("value"));
             }
-
-            btn1.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) {
-                    btn1.setTextColor(Color.rgb(0,0,0));
-                    btn1.setBackgroundColor(Color.rgb(248,248,255));
-                    if(currentIndex!=0)//防止点击出现多次事件
-                        onButtons(0,Integer.parseInt(valueList.get(0)));
-                }
-            }); btn2.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) {
-                    btn2.setTextColor(Color.rgb(0,0,0));
-                    btn2.setBackgroundColor(Color.rgb(248,248,255));
-                    if(currentIndex!=1)//防止点击出现多次事件
-                        onButtons(1,Integer.parseInt(valueList.get(1)));
-                }
-            }); btn3.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) {
-                    btn3.setTextColor(Color.rgb(0,0,0));
-                    btn3.setBackgroundColor(Color.rgb(248,248,255));
-                    if(currentIndex!=2)//防止点击出现多次事件
-                        onButtons(2,Integer.parseInt(valueList.get(2)));
-                }
-            }); btn4.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) {
-                    btn4.setTextColor(Color.rgb(0,0,0));
-                    btn4.setBackgroundColor(Color.rgb(248,248,255));
-                    if(currentIndex!=3)//防止点击出现多次事件
-                        onButtons(3,Integer.parseInt(valueList.get(3)));
-                }
-            }); btn5.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) {
-                    btn5.setTextColor(Color.rgb(0,0,0));
-                    btn5.setBackgroundColor(Color.rgb(248,248,255));
-                    onButtons(4,Integer.parseInt(valueList.get(4)));
-                }
-            }); btn6.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) {
-                    btn6.setTextColor(Color.rgb(0,0,0));
-                    btn6.setBackgroundColor(Color.rgb(248,248,255));
-                    if(currentIndex!=5)//防止点击出现多次事件
-                        onButtons(5,Integer.parseInt(valueList.get(5)));
-                }
-            }); btn7.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) {
-                    btn7.setTextColor(Color.rgb(0,0,0));
-                    btn7.setBackgroundColor(Color.rgb(248,248,255));
-                    if(currentIndex!=6)//防止点击出现多次事件
-                        onButtons(6,Integer.parseInt(valueList.get(6)));
-                }
-            }); btn8.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) {
-                    btn8.setTextColor(Color.rgb(0,0,0));
-                    btn8.setBackgroundColor(Color.rgb(248,248,255));
-                    if(currentIndex!=7)//防止点击出现多次事件
-                        onButtons(7,Integer.parseInt(valueList.get(7)));
-                }
-            }); btn9.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) {
-                    btn9.setTextColor(Color.rgb(0,0,0));
-                    btn9.setBackgroundColor(Color.rgb(248,248,255));
-                    if(currentIndex!=8)//防止点击出现多次事件
-                        onButtons(8,Integer.parseInt(valueList.get(8)));
-                }
-            });
-            btn10.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) {
-                    btn10.setTextColor(Color.rgb(0,0,0));
-                    btn10.setBackgroundColor(Color.rgb(248,248,255));
-                    if(currentIndex!=9)//防止点击出现多次事件
-                        onButtons(9,Integer.parseInt(valueList.get(9)));
-                }
-            });
-            btn11.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) {
-                    btn11.setTextColor(Color.rgb(0,0,0));
-                    btn11.setBackgroundColor(Color.rgb(248,248,255));
-                    if(currentIndex!=10)//防止点击出现多次事件
-                        onButtons(10,Integer.parseInt(valueList.get(10)));
-                }
-            });
+            for(int j=0;j<11;j++){
+                radioButtons.get(j).setOnClickListener(new MyOnClickListener(j));
+            }
             // TODO Auto-generated method stub
             super.onPostExecute(result);
         }
@@ -485,4 +384,5 @@ public class MainActivity extends AppCompatActivity {
             return list;
         }
     }
+
 }
