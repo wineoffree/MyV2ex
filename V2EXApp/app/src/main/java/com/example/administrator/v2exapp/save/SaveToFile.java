@@ -4,7 +4,10 @@ import android.graphics.Bitmap;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.widget.Toast;
+
+import com.example.administrator.v2exapp.MainActivity;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -25,12 +28,11 @@ public class SaveToFile {
         filepath =Environment.getExternalStorageDirectory().getAbsolutePath()+"/myv2ex";
         makeRootDirectory(filepath);
     }
-
     public SaveToFile(Context context){
         this.context=context;
     }
     public  void deleteFile(){
-        final Handler handler = new Handler(){
+          final Handler handler = new Handler(){
 
             @Override
             public void handleMessage(Message msg) {
@@ -44,6 +46,7 @@ public class SaveToFile {
         new Thread(new Runnable() {
             @Override
             public void run() {
+                Log.d("papapa","hahahah");
                 File files = null;
                 try {
                     files = new File(Environment.getExternalStorageDirectory().getAbsolutePath()+"/myv2ex");
@@ -64,6 +67,7 @@ public class SaveToFile {
         }).start();
 
     }
+
     public void setContent(String content){
 
         this.content=content;

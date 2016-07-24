@@ -6,6 +6,8 @@ import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.ListView;
+import android.widget.ProgressBar;
+
 import com.example.administrator.v2exapp.listadapter.ListWithoutNetAdapter;
 import com.example.netlibrary.CacheImage;
 
@@ -17,15 +19,15 @@ import java.util.Map;
  * Created by Administrator on 2016/7/13.
  */
 public class FileShowTask extends AsyncTask<String, Integer, List<Map<String,String>>> {
-    ProgressDialog progressDialog;
+    ProgressBar progressBar;
     ListWithoutNetAdapter adapter;
     ListView listView;//下拉框
     Context context;
     int i;
     int index;
     ArrayList<Bitmap> bitmaps;
-    public FileShowTask(ProgressDialog progressDialog, ListWithoutNetAdapter adapter, ListView listView, Context context, int index){
-        this.progressDialog=progressDialog;
+    public FileShowTask( ProgressBar progressBar, ListWithoutNetAdapter adapter, ListView listView, Context context, int index){
+        this.progressBar=progressBar;
         this.adapter=adapter;
         this.listView=listView;
         this.context=context;
@@ -38,7 +40,7 @@ public class FileShowTask extends AsyncTask<String, Integer, List<Map<String,Str
         // TODO Auto-generated method stub
         super.onPreExecute();
         bitmaps=new ArrayList<Bitmap>();
-        progressDialog.show();
+        progressBar.setVisibility(ProgressBar.VISIBLE);
     }
 
     @Override
@@ -49,7 +51,7 @@ public class FileShowTask extends AsyncTask<String, Integer, List<Map<String,Str
         adapter.setBitmaps(bitmaps);
         listView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
-        progressDialog.dismiss();
+        progressBar.setVisibility(ProgressBar.INVISIBLE);
     }
 
     @Override

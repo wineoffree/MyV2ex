@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.text.Html;
@@ -20,6 +21,9 @@ import com.example.administrator.v2exapp.save.DateFromFile;
 import com.example.netlibrary.CacheImage;
 import com.example.netlibrary.DownImageTask;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +46,8 @@ public class SecondTask extends AsyncTask<String, Integer, List<Map<String,Strin
     ImageView imageView;
     Bitmap bitmap;
     boolean ifHasNet;
+    Html.ImageGetter imageGetter;
+    CharSequence Content;
    ArrayList<View>views=new ArrayList<View>();
     public SecondTask(ProgressDialog progressDialog ,
                       Context context,
@@ -78,7 +84,7 @@ public class SecondTask extends AsyncTask<String, Integer, List<Map<String,Strin
         Log.d("hahaha","show:615156");
         if(ifHasNet) {
             try {
-                textView.setText(Html.fromHtml(topicContent));
+                textView.setText(Content);
                 textView.setMovementMethod(LinkMovementMethod.getInstance());
                 LinearLayout layout = new LinearLayout(context);
                 LayoutInflater inflater = LayoutInflater.from(context);
@@ -104,6 +110,27 @@ public class SecondTask extends AsyncTask<String, Integer, List<Map<String,Strin
 
     @Override
     protected List<Map<String,String>> doInBackground(String... params) {
+         imageGetter = new Html.ImageGetter() {
+            @Override
+            public Drawable getDrawable(String source) {
+                // TODO Auto-generated method stub
+                URL url;
+                Drawable drawable = null;
+                try {
+                    url = new URL(source);
+                    drawable = Drawable.createFromStream(
+                            url.openStream(), null);
+                    drawable.setBounds(0, 0,
+                            drawable.getIntrinsicWidth(),
+                            drawable.getIntrinsicHeight());
+                } catch (Exception e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                return drawable;
+            }
+        };
+
         //通过内存找
         Bitmap abitmap = CacheImage.getBitmap(imaUrl.replaceAll("/","").replace(".png?m=","").replace("_",""));
         if(abitmap!=null)
@@ -116,6 +143,10 @@ public class SecondTask extends AsyncTask<String, Integer, List<Map<String,Strin
         DrawDate drawDate=new DrawDate(url);
         drawDate.connectSecond();
         topicContent= drawDate.getTopicContent();
+            try {
+                Content = Html.fromHtml(topicContent, imageGetter, null);
+            }
+          catch (Exception e){e.printStackTrace();}
         list=drawDate.getSecondRequestList();}
         return list;
     }

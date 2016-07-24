@@ -29,11 +29,20 @@ public class ListWithNetAdapter extends BaseAdapter {
      int index;
     //定义当前listview是否在滑动状态
     private  boolean scrollState=false;
+    //判断是否加载好
+    boolean ifFinishDownload;
     public ListWithNetAdapter(Context context,int index) {
+        ifFinishDownload=false;
         this.index=index;
         this.context = context;
         layoutInflater = layoutInflater.from(context);
         scrollState=false;
+    }
+    public void setIfFinishDownload(boolean ifFinishDownload){
+        this.ifFinishDownload=ifFinishDownload;
+    }
+    public boolean getIfFinishDownload(){
+        return this.ifFinishDownload;
     }
     public int  getIndex(){
         return this.index;
@@ -103,9 +112,6 @@ public class ListWithNetAdapter extends BaseAdapter {
             //默认图片
             viewHolder.img.setImageResource(R.drawable.unload);
         }
-
-
-
         return convertView;
     }
 

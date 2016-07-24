@@ -73,8 +73,6 @@ public class DrawDate {
                 map.put("type",type);  jsonObject.put("type",type);
                 String time =date.select("span[class~=^small fade$]").select(":contains(前)").text();
                 map.put("time",time );  jsonObject.put("time",time );
-                Log.d("timeasd",date.select("span[class~=^small fade$]").text());
-                Log.d("timeasd",time);
                 String showId=date.select("td[align~=^right$]").select("a").text();
                 map.put("showId",showId);    jsonObject.put("showId",showId);
                 jsonArray.put(jsonObject);

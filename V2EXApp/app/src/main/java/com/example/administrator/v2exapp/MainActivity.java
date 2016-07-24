@@ -22,6 +22,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -29,9 +31,11 @@ import android.widget.HorizontalScrollView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.support.v4.app.Fragment;
 
 import com.example.administrator.v2exapp.listadapter.ListWithNetAdapter;
 import com.example.administrator.v2exapp.listadapter.ListWithoutNetAdapter;
@@ -62,7 +66,8 @@ public class MainActivity extends AppCompatActivity {
     //listview适配器
     ListWithNetAdapter listWithNetAdapter=null;ListWithoutNetAdapter listWithoutNetAdapter=null;
     //进度条
-    ProgressDialog progressDialog;
+    ProgressBar progressBar;
+    ProgressBar reProgressBar;
     //是否有网
     boolean ifHasNet=false;
     //监听当前的 index
@@ -72,12 +77,11 @@ public class MainActivity extends AppCompatActivity {
     Button delete,sortpager;
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
-    //手势
-    GestureDetector mDetector;
-    // 标记手势是否滑动
-    private boolean Flag = false;
-    //
+    //listview第一个ITEM是否显示
     private int firstItem=0;
+    //进度条初始位置 上次位置
+    float originY;float lastY;
+    Animation animation = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,25 +89,29 @@ public class MainActivity extends AppCompatActivity {
         CacheImage cacheImage=new CacheImage();
         InitialPager();
         InitRadioButton();
-        MyPagerAdapter adapter = new MyPagerAdapter(viewList);
+        final MyPagerAdapter adapter = new MyPagerAdapter(viewList);
         //设定viewPager适配器
         viewPagerp = (ViewPager)findViewById(R.id.viewpager);
         viewPagerp.setAdapter(adapter);
         viewPagerp.addOnPageChangeListener(new MyPageChangeListener());
-        progressDialog = new ProgressDialog(this);
-        progressDialog.setTitle("loading..");
+        progressBar = (ProgressBar)findViewById(R.id.bar);
+        progressBar .setVisibility(View.VISIBLE);
+        reProgressBar=(ProgressBar)findViewById(R.id.rebar);
+        reProgressBar.setVisibility(View.INVISIBLE);
+        lastY=progressBar.getY();
+        originY=lastY;
         //初始化界面
         //无网时
         ifHasNet=isNetworkAvailable(MainActivity.this);
         if(ifHasNet){
             listWithNetAdapter = new ListWithNetAdapter(MainActivity.this, 0);
             listView.setOnScrollListener(new myListViewlistener());
-            FirstTask downloadTheLastTask = new FirstTask(progressDialog, listWithNetAdapter, listView, MainActivity.this, 0);
+            FirstTask downloadTheLastTask = new FirstTask(progressBar ,listWithNetAdapter, listView, MainActivity.this, 0);
             downloadTheLastTask.execute();
         }
         else {
             listWithoutNetAdapter=new ListWithoutNetAdapter(MainActivity.this,0);
-            FileShowTask fileShowTask=new  FileShowTask(progressDialog,listWithoutNetAdapter,listView,MainActivity.this,0);
+            FileShowTask fileShowTask=new  FileShowTask(progressBar,listWithoutNetAdapter,listView,MainActivity.this,0);
             fileShowTask.execute();
         }
         toolbar = (Toolbar)findViewById(R.id.toolbar);
@@ -115,44 +123,78 @@ public class MainActivity extends AppCompatActivity {
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, R.string.app_name, R.string.app_name) ;
         mDrawerToggle.syncState();
         mDrawerLayout.addDrawerListener(mDrawerToggle);
-        mDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
-            @Override
-            public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-                // 手势向下 down
-                if ((e2.getRawY() - e1.getRawY()) > 300&&velocityY > 1500) {
-                    if (firstItem==0){
-                        ifHasNet=isNetworkAvailable(MainActivity.this);
-                        if(ifHasNet){
-                            listWithNetAdapter = new ListWithNetAdapter(MainActivity.this,mainIndex);
-                            listView.setOnScrollListener(new myListViewlistener());
-                            FirstTask downloadTheLastTask = new FirstTask(progressDialog, listWithNetAdapter, listView, MainActivity.this, mainIndex);
-                            downloadTheLastTask.execute();}
-                        else {
-                            listWithoutNetAdapter=new ListWithoutNetAdapter(MainActivity.this, mainIndex);
-                            FileShowTask fileShowTask=new  FileShowTask(progressDialog,listWithoutNetAdapter,listView,MainActivity.this, mainIndex);
-                            fileShowTask.execute();
-                        }
-                    }
-
-                }
-                return super.onFling(e1, e2, velocityX, velocityY);
-            }
-        });
     }
+
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
         //TouchEvent dispatcher.
-        if (mDetector != null) {
-            if (mDetector.onTouchEvent(ev))
-                //If the gestureDetector handles the event, a swipe has been executed and no more needs to be done.
-                return true;
-        }
+        this.onTouchEvent(ev);
         return super.dispatchTouchEvent(ev);
     }
+    //上次手势位置
+    float lastGestureY;
+    //记录初始手势位置
+    float originGestureY;
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        mDetector.onTouchEvent(event);
-        return super.onTouchEvent(event);
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            lastY=originY;
+            originGestureY=event.getRawY();
+            lastGestureY=event.getRawY();
+        } else if (event.getAction() == MotionEvent.ACTION_UP) {
+            if(listWithNetAdapter.getIfFinishDownload())
+                if (firstItem==0){
+                if((event.getRawY()-originGestureY)>300){
+                    if(listWithNetAdapter.getIfFinishDownload())
+                        {
+                            ifHasNet=isNetworkAvailable(MainActivity.this);
+                            if(ifHasNet){
+                                ListWithNetAdapter listWithNetAdapter2=new ListWithNetAdapter(MainActivity.this,mainIndex);
+                                listView.setOnScrollListener(new myListViewlistener());
+                                FirstTask downloadTheLastTask = new FirstTask(progressBar, listWithNetAdapter2, listWithNetAdapter, listView, MainActivity.this, mainIndex);
+                                downloadTheLastTask.execute();
+                            }
+                            else {
+                                listWithoutNetAdapter=new ListWithoutNetAdapter(MainActivity.this, mainIndex);
+                                FileShowTask fileShowTask=new  FileShowTask(progressBar,listWithoutNetAdapter,listView,MainActivity.this, mainIndex);
+                                fileShowTask.execute();
+                            }
+                            reProgressBar.clearAnimation();
+                            reProgressBar.setVisibility(ProgressBar.INVISIBLE);
+                        }
+                }
+                    else {
+                    if((lastY-originY)>3){
+                    animation = new TranslateAnimation(0, 0, lastY,originY);
+                    animation.setDuration(400);
+                    reProgressBar.startAnimation(animation);}
+                }
+                }
+        } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
+            if((event.getRawY()-lastGestureY)>3)
+            if(listWithNetAdapter.getIfFinishDownload())
+                if(event.getRawY()>lastGestureY)
+                if(firstItem==0){
+                    if(lastY<400){
+                        reProgressBar.setVisibility(View.VISIBLE);
+                        animation = new TranslateAnimation(0, 0, lastY,lastY+event.getRawY()-lastGestureY);
+                        animation.setFillAfter(true);
+                        animation.setDuration(400);
+                        reProgressBar.startAnimation(animation);
+                    }
+                    if(lastY>400){
+                        reProgressBar.setVisibility(View.VISIBLE);
+                        animation = new TranslateAnimation(0, 0, lastY,lastY);
+                        animation.setDuration(1000);
+                        reProgressBar.startAnimation(animation);
+                    }
+                }
+            lastY=lastY+event.getRawY()-lastGestureY;
+            lastGestureY=event.getRawY();
+            reProgressBar.setVisibility(View.INVISIBLE);
+        }
+
+        return false;
     }
     //drawer中点击事件
     public void drawOnclick(){
@@ -167,6 +209,7 @@ public class MainActivity extends AppCompatActivity {
                 saveToFile.deleteFile();
             }
         });
+
     }
     //menu布局
     public boolean onCreateOptionsMenu(Menu menu)
@@ -178,7 +221,7 @@ public class MainActivity extends AppCompatActivity {
     }
     // 菜单项被单击后的回调方法
     public boolean onOptionsItemSelected(MenuItem mi)
-    {
+    {   reProgressBar.clearAnimation();
         if(mi.isCheckable())
         {
             // 勾选该菜单项
@@ -194,13 +237,14 @@ public class MainActivity extends AppCompatActivity {
             case R.id.refresh:
                 ifHasNet=isNetworkAvailable(MainActivity.this);
                 if(ifHasNet){
-                    listWithNetAdapter = new ListWithNetAdapter(MainActivity.this,mainIndex);
+                    ListWithNetAdapter listWithNetAdapter2=new ListWithNetAdapter(MainActivity.this,mainIndex);
                     listView.setOnScrollListener(new myListViewlistener());
-                    FirstTask downloadTheLastTask = new FirstTask(progressDialog, listWithNetAdapter, listView, MainActivity.this, mainIndex);
-                    downloadTheLastTask.execute();}
+                    FirstTask downloadTheLastTask = new FirstTask(progressBar, listWithNetAdapter2,listWithNetAdapter, listView, MainActivity.this, mainIndex);
+                    downloadTheLastTask.execute();
+                }
                 else {
                     listWithoutNetAdapter=new ListWithoutNetAdapter(MainActivity.this, mainIndex);
-                    FileShowTask fileShowTask=new  FileShowTask(progressDialog,listWithoutNetAdapter,listView,MainActivity.this, mainIndex);
+                    FileShowTask fileShowTask=new  FileShowTask(progressBar,listWithoutNetAdapter,listView,MainActivity.this, mainIndex);
                     fileShowTask.execute();
                 }
                 break;
@@ -272,21 +316,19 @@ public class MainActivity extends AppCompatActivity {
         listView.setOnItemClickListener(new MyListViewClicklistener());
         ifHasNet=isNetworkAvailable(MainActivity.this);
         if(ifHasNet){
-            listWithNetAdapter = new ListWithNetAdapter(MainActivity.this,i);
+            ListWithNetAdapter listWithNetAdapter2=new ListWithNetAdapter(MainActivity.this,i);
             listView.setOnScrollListener(new myListViewlistener());
-            FirstTask downloadTheLastTask = new FirstTask(progressDialog, listWithNetAdapter, listView, MainActivity.this,i);
+            FirstTask downloadTheLastTask = new FirstTask(progressBar, listWithNetAdapter2,listWithNetAdapter, listView, MainActivity.this,i);
             downloadTheLastTask.execute();
-
         }
         else {
             listWithoutNetAdapter=new ListWithoutNetAdapter(MainActivity.this,i);
-            FileShowTask fileShowTask=new  FileShowTask(progressDialog,listWithoutNetAdapter,listView,MainActivity.this,i);
+            FileShowTask fileShowTask=new  FileShowTask(progressBar,listWithoutNetAdapter,listView,MainActivity.this,i);
             fileShowTask.execute();
         }
     }
     //初始化button
     private void InitRadioButton() {
-
         horizontalScrollView=(HorizontalScrollView)findViewById(R.id.scrollView) ;
         btn1 = (RadioButton) findViewById(R.id.btn1);
         btn1.setOnClickListener(new View.OnClickListener() {
@@ -412,6 +454,7 @@ public class MainActivity extends AppCompatActivity {
                     catch (Exception e){e.printStackTrace();}
                         //当前屏幕中listview的子项的个数
                         int count = absListView.getChildCount();
+                        Log.e("MainActivity", count + "");
                         firstItem=absListView.getFirstVisiblePosition();
                         for (int i = 0; i < count; i++) {
 
@@ -420,6 +463,7 @@ public class MainActivity extends AppCompatActivity {
 
 
                             if (!ima.getTag().equals("1")) {//!="1"说明需要加载数据
+                                Log.d("imamamama",ima.toString());
                                 String image_url = ima.getTag().toString();//直接从Tag中取出我们存储的数据image——url
                                 new DownImageTask(ima).execute(image_url);
                                 ima.setTag("1");//设置为已加载过数据
@@ -465,6 +509,8 @@ public class MainActivity extends AppCompatActivity {
     public class MyPageChangeListener implements ViewPager.OnPageChangeListener {
         @Override
         public void onPageSelected(int arg0) {
+            listWithNetAdapter.setIfFinishDownload(false);
+            reProgressBar.clearAnimation();
             if(arg0==0){btn1.performClick();horizontalScrollView.scrollTo(0,0);}
             if(arg0==1){btn2.performClick();horizontalScrollView.scrollTo(0,0);}
             if(arg0==2){btn3.performClick();horizontalScrollView.scrollTo(0,0);}
@@ -492,7 +538,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
             ifHasNet=isNetworkAvailable(MainActivity.this);
-            if(ifHasNet){
+            if(ifHasNet){Log.d("pipi",listWithNetAdapter.getList().get(position).get("newUrl"));
                 Date date=new Date(listWithNetAdapter.getList().get(position).get("newUrl"),
                         listWithNetAdapter.getList().get(position).get("name"),
                         listWithNetAdapter.getList().get(position).get("type"),

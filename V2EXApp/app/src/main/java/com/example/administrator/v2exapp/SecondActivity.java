@@ -78,8 +78,6 @@ public class SecondActivity extends AppCompatActivity {
     }
     public void  Initialview(){
         linearLayout=(LinearLayout)findViewById(R.id.linear);
-        progressDialog = new ProgressDialog(this);
-        progressDialog.setTitle("正在下载....");
        imageView=(ImageView)findViewById(R.id.ima);
         TextView name=(TextView)findViewById(R.id.name);name.setText(date.getName());
         TextView type=(TextView)findViewById(R.id.name);type.setText(date.getType());
