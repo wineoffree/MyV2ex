@@ -1,13 +1,10 @@
 package com.example.administrator.v2exapp.save;
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.widget.Toast;
-
-import com.example.administrator.v2exapp.MainActivity;
 
 import java.io.BufferedWriter;
 import java.io.File;

@@ -209,7 +209,16 @@ public class MainActivity extends AppCompatActivity {
                 saveToFile.deleteFile();
             }
         });
-
+        sortpager.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                SortPagerFragment fragment = new  SortPagerFragment();
+                // 使用fragment替换book_detail_container容器当前显示的Fragment
+                getFragmentManager().beginTransaction()
+                        .replace(R.id.frage, fragment)
+                        .commit();
+            }
+        });
     }
     //menu布局
     public boolean onCreateOptionsMenu(Menu menu)
