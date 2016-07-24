@@ -1,6 +1,10 @@
 package com.example.administrator.v2exapp.save;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
+import android.widget.Toast;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -11,7 +15,7 @@ import java.io.IOException;
  * Created by Administrator on 2016/7/8.
  */
 public class SaveToFile {
-
+    Context context;
     FileOutputStream out=null;
     String filepath;
     String content;
@@ -22,7 +26,44 @@ public class SaveToFile {
         makeRootDirectory(filepath);
     }
 
+    public SaveToFile(Context context){
+        this.context=context;
+    }
+    public  void deleteFile(){
+        final Handler handler = new Handler(){
 
+            @Override
+            public void handleMessage(Message msg) {
+                // TODO Auto-generated method stub
+                super.handleMessage(msg);
+                Toast.makeText(context,"删除完毕",Toast.LENGTH_SHORT).show();
+            }
+
+        };
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                File files = null;
+                try {
+                    files = new File(Environment.getExternalStorageDirectory().getAbsolutePath()+"/myv2ex");
+                    if (files.exists()) {
+                        File Files[] = files.listFiles();
+                        if (files != null)
+                            for (File f : Files) {
+                                f.delete();
+                            }
+                        Message message = Message.obtain();
+                        handler.sendMessage(message);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                };
+
+            }
+        }).start();
+
+    }
     public void setContent(String content){
 
         this.content=content;

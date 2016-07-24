@@ -108,6 +108,7 @@ public class MainActivity extends AppCompatActivity {
         }
         toolbar = (Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        drawOnclick();
         getSupportActionBar().setHomeButtonEnabled(true); //设置返回键可用
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         mDrawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
@@ -153,7 +154,20 @@ public class MainActivity extends AppCompatActivity {
         mDetector.onTouchEvent(event);
         return super.onTouchEvent(event);
     }
-
+    //drawer中点击事件
+    public void drawOnclick(){
+        Log.d("papapa","hahahah");
+        delete=(Button)findViewById(R.id.delete);
+        sortpager=(Button)findViewById(R.id.sortpager);
+        delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d("papapa","hahahah");
+                SaveToFile saveToFile=new SaveToFile(MainActivity.this);
+                saveToFile.deleteFile();
+            }
+        });
+    }
     //menu布局
     public boolean onCreateOptionsMenu(Menu menu)
     {
