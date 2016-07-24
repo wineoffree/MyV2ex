@@ -1,13 +1,12 @@
 package com.example.administrator.v2exapp.netspider;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 
 import com.example.administrator.v2exapp.listadapter.ListWithNetAdapter;
+import com.example.administrator.v2exapp.mycomponents.RefreshListview;
 import com.example.administrator.v2exapp.save.SaveTask;
 
 import java.util.List;
@@ -21,22 +20,25 @@ public class FirstTask extends AsyncTask<String, Integer, List<Map<String,String
     ProgressBar progressBar ;
     ListWithNetAdapter adapter;
     ListWithNetAdapter spareAdapter=null;//设置两个为了防止刷新时点击
-    ListView listView;//下拉框
+    RefreshListview listView;//下拉框
     Context context;
     int i;
     int index;
     String content;
-    public FirstTask(ProgressBar progressBar, ListWithNetAdapter adapter,ListWithNetAdapter spareAdapter,ListView listView, Context context, int index){
+    public FirstTask(ProgressBar progressBar, ListWithNetAdapter adapter,ListWithNetAdapter spareAdapter,RefreshListview listView, Context context, int index){
         this.progressBar=progressBar;
         this.adapter=adapter;
         this.listView=listView;
         this.context=context;
         this.index=index;
         this.spareAdapter=spareAdapter;
+        adapter.setIfFinishDownload(false);
+        spareAdapter.setIfFinishDownload(false);
     }
-    public FirstTask(ProgressBar progressBar, ListWithNetAdapter adapter,ListView listView, Context context, int index){
+    public FirstTask(ProgressBar progressBar, ListWithNetAdapter adapter,RefreshListview listView, Context context, int index){
         this.progressBar=progressBar;
         this.adapter=adapter;
+        adapter.setIfFinishDownload(false);
         this.listView=listView;
         this.context=context;
         this.index=index;
@@ -54,7 +56,6 @@ public class FirstTask extends AsyncTask<String, Integer, List<Map<String,String
         // TODO Auto-generated method stub
         super.onPostExecute(result);
         adapter.setData(result);
-        adapter.setIfFinishDownload(true);
         listView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
         if(spareAdapter!=null){
@@ -63,6 +64,7 @@ public class FirstTask extends AsyncTask<String, Integer, List<Map<String,String
             spareAdapter.notifyDataSetChanged();
         }
         progressBar.setVisibility(ProgressBar.INVISIBLE);
+        adapter.setIfFinishDownload(true);
         SaveTask saveTask=new SaveTask(index,content);
         saveTask.execute();
     }

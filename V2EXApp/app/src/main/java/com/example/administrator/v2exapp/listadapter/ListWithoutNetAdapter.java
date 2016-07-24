@@ -28,6 +28,7 @@ public class ListWithoutNetAdapter extends BaseAdapter {
     private  boolean scrollState=false;
     ArrayList<Bitmap> bitmaps=new ArrayList<Bitmap>();
     public ListWithoutNetAdapter(Context context,int index) {
+
         this.index=index;
         this.context = context;
         layoutInflater = layoutInflater.from(context);

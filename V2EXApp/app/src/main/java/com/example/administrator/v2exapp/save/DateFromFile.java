@@ -24,6 +24,8 @@ public class DateFromFile {
     int index;
     String imaUrl;
     Bitmap bitmap;
+    String configure;
+    String []strings={"全部","创意","好玩","apple","酷工作","交易","城市","问与答","最热","技术","R2",};
     public void setIndex(int index){
         this.index=index;
     }
@@ -77,5 +79,43 @@ public class DateFromFile {
         return bitmap;
     }
 
+    public void getConfigure( List<Map<String,String>> list){
+        String resultStr = null;
+        try {
+            File filecontent = new File(filepath + "/save" + "Configure.txt");
+            if(filecontent.exists()){
+            FileInputStream fileInputStream = new FileInputStream(filecontent);
+            byte[] b = new byte[fileInputStream.available()];
+            fileInputStream.read(b);
+            resultStr = new String(b);
+        if(fileInputStream != null){
+            fileInputStream.close();
+        }
+        JSONArray jsonArray=new JSONArray(resultStr);
+        for (int i = 0; i < jsonArray.length(); i++) {
+            JSONObject jsonObject2 = jsonArray.getJSONObject(i);
+            Map<String ,String> map = new HashMap<String, String>();
+            map.put("tab",jsonObject2.getString("tab"));
+            map.put("value",jsonObject2.getString("value"));
+            list.add(map);
+        }}
+            else {
+                for (int i = 0; i < 11; i++) {
+                    Map<String ,String> map = new HashMap<String, String>();
+                    map.put("tab",strings[i]);
+                    map.put("value",String.valueOf(i));
+                    list.add(map);
+            }
+            }
+    } catch (Exception e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+    }
+    }
 
+    public  List<Map<String,String>> getRequestConfigureList(){
+        List<Map<String,String>> list = new ArrayList<Map<String ,String>>();
+        getConfigure(list);
+        return list;
+    }
 }

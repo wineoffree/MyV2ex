@@ -21,8 +21,6 @@ import com.example.administrator.v2exapp.save.DateFromFile;
 import com.example.netlibrary.CacheImage;
 import com.example.netlibrary.DownImageTask;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;

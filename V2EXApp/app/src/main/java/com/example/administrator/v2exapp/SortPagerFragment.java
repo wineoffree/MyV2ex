@@ -2,7 +2,8 @@ package com.example.administrator.v2exapp;
 
 import android.app.Fragment;
 import android.os.Bundle;
-
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -10,9 +11,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ListView;
+
+import com.example.administrator.v2exapp.mycomponents.DragListView;
+import com.example.administrator.v2exapp.save.SaveConfigureTask;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.jsoup.nodes.Element;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Administrator on 2016/7/20.
@@ -22,33 +32,60 @@ public class SortPagerFragment extends Fragment {
     public void onDestroy() {
         super.onDestroy();
     }
-    String []strings={"全部","创意","好玩","apple","酷工作","交易","城市","问与答","最热","技术","R2",};
+    DragListView sortListView;
+    static public boolean ifCancelOntouch=false;
+    Button sure,cancel;
+    ArrayList<String> tabList;
+    ArrayList<String> valueList;
+    List<Map<String,String>> Lists;
+    MainActivity mainActivity;
     @Override
     public View onCreateView(LayoutInflater inflater,ViewGroup container,Bundle savedInstanceState) {
+        mainActivity=(MainActivity)getActivity();
         View view=inflater.inflate(R.layout.fragment_sort_pager,container,false);
-        DragListView sortListView=(DragListView)view.findViewById(R.id.sortlistview);
-        view.setOnKeyListener(backlistener);
-        ArrayList<String> arrayList=new ArrayList<String>();
+        sortListView=(DragListView)view.findViewById(R.id.sortlistview);
+        Lists=mainActivity.tabList;
+        tabList=new ArrayList<String>();
         for(int i=0;i<11;i++){
-            arrayList.add(strings[i]);
+            tabList.add(mainActivity.tabList.get(i).get("tab"));
         }
-        ArrayAdapter<String> adapter=new ArrayAdapter<String>(view.getContext(),android.R.layout.simple_list_item_1,arrayList);
+        valueList=new ArrayList<String>();
+        for(int i=0;i<11;i++){
+            valueList.add(mainActivity.tabList.get(i).get("value"));
+        }
+        ArrayAdapter<String> adapter=new ArrayAdapter<String>(view.getContext(),android.R.layout.simple_list_item_1,tabList);
+        sortListView.setList(tabList,valueList);
         sortListView.setAdapter(adapter);
-        Button sure=(Button)view.findViewById(R.id.sortsure);
+        sure=(Button)view.findViewById(R.id.sortsure);
         sure.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d("qiqi","sadas");
+                JSONArray jsonArray=new JSONArray();
+                try {
+                    Lists = new ArrayList<Map<String ,String>>();
+                    for (int i = 0; i < 11; i++) {
+                        JSONObject jsonObject=new JSONObject();
+                        Map<String ,String> map = new HashMap<String, String>();
+                        map.put("tab",sortListView.getTabList().get(i));jsonObject.put("tab",sortListView.getTabList().get(i));
+                        map.put("value",sortListView.getvalueList().get(i));jsonObject.put("value",sortListView.getvalueList().get(i));
+                        Lists.add(map);
+                        jsonArray.put(jsonObject);
+                    }
+                    mainActivity.tabList=Lists;
+                }
+                catch (Exception e){e.printStackTrace();}
+                SaveConfigureTask saveConfigureTask=new SaveConfigureTask(jsonArray.toString(),mainActivity.handler);
+                saveConfigureTask.execute();
                 getFragmentManager().beginTransaction()
                         .remove(SortPagerFragment.this)
                         .commit();
             }
         });
-        Button cancel=(Button)view.findViewById(R.id.sortcancel);
+         cancel=(Button)view.findViewById(R.id.sortcancel);
         cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d("qiqi","sadas");
+
                 getFragmentManager().beginTransaction()
                         .remove(SortPagerFragment.this)
                         .commit();
@@ -57,20 +94,6 @@ public class SortPagerFragment extends Fragment {
         return view;
     }
 
-    private View.OnKeyListener backlistener = new View.OnKeyListener() {
-        @Override
-        public boolean onKey(View view, int i, KeyEvent keyEvent) {
-            if (keyEvent.getAction() == KeyEvent.ACTION_DOWN) {
-                if (i == KeyEvent.KEYCODE_BACK) {  //表示按返回键 时的操作
-                    Log.d("qiqi","sadassadsadsdasdasdsadasdasdas");
-                    getFragmentManager().beginTransaction()
-                            .remove(SortPagerFragment.this)
-                            .commit();
-                    return true;    //已处理
-                }
-            }
-            return true;
-        }
-    };
+
 
 }

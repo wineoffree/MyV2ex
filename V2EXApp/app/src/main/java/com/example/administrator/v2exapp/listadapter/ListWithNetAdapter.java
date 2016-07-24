@@ -13,7 +13,6 @@ import android.widget.TextView;
 import com.example.administrator.v2exapp.R;
 import com.example.netlibrary.DownImageTask;
 
-
 import java.util.List;
 import java.util.Map;
 

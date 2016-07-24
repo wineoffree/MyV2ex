@@ -1,4 +1,4 @@
-package com.example.administrator.v2exapp;
+package com.example.administrator.v2exapp.mycomponents;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -41,6 +41,8 @@ public class DragListView extends ListView {
     private WindowManager windowManager;//windows窗口控制类
     private WindowManager.LayoutParams layoutParams;//用于控制拖拽项的显示的参数
     private int scaledTouchSlop;//触发移动事件的最短距离
+    private ArrayList<String> tabList=new ArrayList<String>();
+    private ArrayList<String> valueList=new ArrayList<String>();
     public DragListView(Context context) {
         super(context);
         this.context=context;
@@ -56,35 +58,35 @@ public class DragListView extends ListView {
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
         if (ev.getAction()==MotionEvent.ACTION_DOWN) {
-            stopDrag();
-            final int x = (int) ev.getX();
-            final int y = (int) ev.getY();
-            final int itemNum = pointToPosition(x, y);
-            if(itemNum == AdapterView.INVALID_POSITION){
-                return super.onInterceptTouchEvent(ev);
-            }
-            final View item = (View) getChildAt(itemNum - getFirstVisiblePosition());
-            dragPointX = x - item.getLeft();
-            dragPointY = y - item.getTop();
-            dragOffsetX = ((int) ev.getRawX()) - x;
-            dragOffSetY = ((int) ev.getRawY()) - y;
-            //长按
-            item.setOnLongClickListener(new OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    //upScrollBounce当在屏幕的上部(上面1/3区域)或者更上的区域，执行拖动的边界，downScrollBounce同理定义
-                    final int height = getHeight();
-                    upperBound = Math.min(y - scaledTouchSlop, height / 3);
-                    lowerBound = Math.max(y + scaledTouchSlop, height * 2 / 3);
-                    dragCurrentPosition = dragStartPosition = itemNum;
-                    item.setDrawingCacheEnabled(true);
-                    Bitmap bitmap = Bitmap.createBitmap(item.getDrawingCache());
-                    //避免重复缓存
-                    item.destroyDrawingCache();
-                    startDrag(bitmap,x,y);
-                    return true;
+                 stopDrag();
+                final int x = (int) ev.getX();
+                final int y = (int) ev.getY();
+                final int itemNum = pointToPosition(x, y);
+                if(itemNum == AdapterView.INVALID_POSITION){
+                    return super.onInterceptTouchEvent(ev);
                 }
-            });
+                final View item = (View) getChildAt(itemNum - getFirstVisiblePosition());
+                dragPointX = x - item.getLeft();
+                dragPointY = y - item.getTop();
+                dragOffsetX = ((int) ev.getRawX()) - x;
+                dragOffSetY = ((int) ev.getRawY()) - y;
+                //长按
+                item.setOnLongClickListener(new OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View v) {
+                        //upScrollBounce当在屏幕的上部(上面1/3区域)或者更上的区域，执行拖动的边界，downScrollBounce同理定义
+                        final int height = getHeight();
+                        upperBound = Math.min(y - scaledTouchSlop, height / 3);
+                        lowerBound = Math.max(y + scaledTouchSlop, height * 2 / 3);
+                        dragCurrentPosition = dragStartPosition = itemNum;
+                        item.setDrawingCacheEnabled(true);
+                        Bitmap bitmap = Bitmap.createBitmap(item.getDrawingCache());
+                        //避免重复缓存
+                        item.destroyDrawingCache();
+                        startDrag(bitmap,x,y);
+                        return true;
+                    }
+                });
         }
         return super.onInterceptTouchEvent(ev);
     }
@@ -134,7 +136,7 @@ public class DragListView extends ListView {
                     //释放拖动影像
                     stopDrag();
                     //放下后，判断位置，实现相应的位置删除和插入
-                    onDrop(upx,upY);
+                   onDrop(upx,upY);
                     break;
                 case MotionEvent.ACTION_MOVE:
                     int moveY = (int)ev.getY();
@@ -191,12 +193,29 @@ public class DragListView extends ListView {
         if(dragCurrentPosition>=0&&dragCurrentPosition<getAdapter().getCount()){
             ArrayAdapter<String> adapter = (ArrayAdapter<String>)getAdapter();
             String dragItem = adapter.getItem(dragStartPosition);
+            String tab=tabList.get(dragStartPosition);
+            String value=valueList.get(dragStartPosition);
             //删除原位置数据项
             adapter.remove(dragItem);
+            tabList.remove(dragStartPosition);
+            valueList.remove(dragStartPosition);
             //在新位置插入拖动项
             adapter.insert(dragItem, dragCurrentPosition);
+            tabList.add(dragCurrentPosition,tab);
+            valueList.add(dragCurrentPosition,value);
             adapter.notifyDataSetChanged();
         }
     }
-
+    public void setList(ArrayList<String> tabList,ArrayList<String> valueList){
+      for(int i=0;i<tabList.size();i++)
+          this.tabList.add(tabList.get(i));
+        for(int i=0;i<valueList.size();i++)
+            this.valueList.add(valueList.get(i));
+    }
+    public ArrayList<String>getTabList(){
+        return this.tabList;
+    }
+    public ArrayList<String>getvalueList(){
+        return this.valueList;
+    }
 }

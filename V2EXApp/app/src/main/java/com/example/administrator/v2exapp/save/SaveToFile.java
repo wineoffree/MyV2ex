@@ -1,4 +1,5 @@
 package com.example.administrator.v2exapp.save;
+
 import android.content.Context;
 import android.os.Environment;
 import android.os.Handler;
@@ -19,6 +20,7 @@ public class SaveToFile {
     FileOutputStream out=null;
     String filepath;
     String content;
+    String Configure;
     int index;
     public SaveToFile(int index) {
         this.index=index;
@@ -27,6 +29,10 @@ public class SaveToFile {
     }
     public SaveToFile(Context context){
         this.context=context;
+    }
+    public SaveToFile(){
+        filepath =Environment.getExternalStorageDirectory().getAbsolutePath()+"/myv2ex";
+        makeRootDirectory(filepath);
     }
     public  void deleteFile(){
           final Handler handler = new Handler(){
@@ -85,9 +91,7 @@ public class SaveToFile {
     }
 
     public void  saveContent(){
-
         File file;
-
         file = new File(filepath+"/save"+String.valueOf(index)+"content.txt");
         BufferedWriter writer=null;
         try {
@@ -111,4 +115,35 @@ public class SaveToFile {
         catch (Exception e){e.printStackTrace();}
     }
 
+    public void setConfigure(String configure){
+        this.Configure=configure;
+    }
+
+    public void saveConfigure() {
+        File file;
+        file = new File(filepath + "/save" + "Configure.txt");
+        BufferedWriter writer = null;
+        Log.d("pipi","zhen tm bei ju");
+        try {
+            if (!file.createNewFile()) {
+                //file.getParentFile().mkdirs();
+                file.createNewFile();
+                System.out.println("File already exists");
+            }
+        } catch (IOException ex) {
+            System.out.println(ex);
+        }
+        try {
+            FileOutputStream fos = new FileOutputStream(file);
+            fos.write(Configure.getBytes());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        try {
+            out.flush();
+            out.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

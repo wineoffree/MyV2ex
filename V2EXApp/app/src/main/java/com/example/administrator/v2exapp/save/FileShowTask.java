@@ -1,14 +1,13 @@
 package com.example.administrator.v2exapp.save;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 
 import com.example.administrator.v2exapp.listadapter.ListWithoutNetAdapter;
+import com.example.administrator.v2exapp.mycomponents.RefreshListview;
 import com.example.netlibrary.CacheImage;
 
 import java.util.ArrayList;
@@ -21,12 +20,12 @@ import java.util.Map;
 public class FileShowTask extends AsyncTask<String, Integer, List<Map<String,String>>> {
     ProgressBar progressBar;
     ListWithoutNetAdapter adapter;
-    ListView listView;//下拉框
+    RefreshListview listView;//下拉框
     Context context;
     int i;
     int index;
     ArrayList<Bitmap> bitmaps;
-    public FileShowTask( ProgressBar progressBar, ListWithoutNetAdapter adapter, ListView listView, Context context, int index){
+    public FileShowTask(ProgressBar progressBar, ListWithoutNetAdapter adapter, RefreshListview listView, Context context, int index){
         this.progressBar=progressBar;
         this.adapter=adapter;
         this.listView=listView;

@@ -8,7 +8,7 @@
     android:text="长按项目进行排序"
     android:layout_width="match_parent"
     android:layout_height="wrap_content" />
-    <com.example.administrator.v2exapp.DragListView
+    <com.example.administrator.v2exapp.mycomponents.DragListView
         android:id="@+id/sortlistview"
         android:layout_width="match_parent"
         android:layout_height="400dp"/>
