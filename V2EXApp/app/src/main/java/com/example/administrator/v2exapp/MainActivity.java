@@ -4,29 +4,24 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.Environment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
-import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.HorizontalScrollView;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RadioButton;
-import android.widget.TextView;
 
-import com.example.administrator.v2exapp.downloadimg.DownImage;
 import com.example.administrator.v2exapp.downloadimg.DownImageTask;
 import com.example.administrator.v2exapp.listadapter.ListWithNetAdapter;
 import com.example.administrator.v2exapp.listadapter.ListWithoutNetAdapter;
@@ -34,11 +29,10 @@ import com.example.administrator.v2exapp.listadapter.MyPagerAdapter;
 import com.example.administrator.v2exapp.netspider.FirstTask;
 import com.example.administrator.v2exapp.save.CacheImage;
 import com.example.administrator.v2exapp.save.FileShowTask;
+import com.example.administrator.v2exapp.search.SearchChooseActivity;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
     //记录当前指示条和VIEW页面所在位置
@@ -51,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
     // view数组
     private List<View> viewList;
     //viewPager
-    ViewPager vp;
+    ViewPager viewPagerp;
     //listview
     ListView listView;
     //listview适配器
@@ -67,25 +61,17 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         CacheImage cacheImage=new CacheImage();
-
         InitialPager();
         InitRadioButton();
         MyPagerAdapter adapter = new MyPagerAdapter(viewList);
-
-
         //设定viewPager适配器
-        vp = (ViewPager)findViewById(R.id.viewpager);
-        vp.setAdapter(adapter);
-        vp.addOnPageChangeListener(new MyPageChangeListener());
-
+        viewPagerp = (ViewPager)findViewById(R.id.viewpager);
+        viewPagerp.setAdapter(adapter);
+        viewPagerp.addOnPageChangeListener(new MyPageChangeListener());
         progressDialog = new ProgressDialog(this);
         progressDialog.setTitle("正在下载....");
         //初始化界面
-        //listWithNetAdapter=new ListWithNetAdapter(this,0);
-        //FirstTask firstTask=new  FirstTask(progressDialog,listWithNetAdapter,listView,MainActivity.this,0);
-        //firstTask.execute();
         //无网时
-        //文件是否存在
         ifHasNet=isNetworkAvailable(MainActivity.this);
         if(ifHasNet){
             listWithNetAdapter = new ListWithNetAdapter(MainActivity.this, 0);
@@ -98,18 +84,26 @@ public class MainActivity extends AppCompatActivity {
             FileShowTask fileShowTask=new  FileShowTask(progressDialog,listWithoutNetAdapter,listView,MainActivity.this,0);
             fileShowTask.execute();
         }
-
+        //搜索按钮
+        ImageButton search=(ImageButton) findViewById(R.id.search);
+        search.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent=new Intent(MainActivity.this,SearchChooseActivity.class);
+                startActivity(intent);
+            }
+        });
         //刷新按钮
-        Button refresh=(Button) findViewById(R.id.refresh);
+        ImageButton refresh=(ImageButton) findViewById(R.id.refresh);
         refresh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 ifHasNet=isNetworkAvailable(MainActivity.this);
                 if(ifHasNet){
-                    listWithNetAdapter = new ListWithNetAdapter(MainActivity.this,mainIndex);
+                listWithNetAdapter = new ListWithNetAdapter(MainActivity.this,mainIndex);
                     listView.setOnScrollListener(new myListViewlistener());
-                    FirstTask downloadTheLastTask = new FirstTask(progressDialog, listWithNetAdapter, listView, MainActivity.this, mainIndex);
-                    downloadTheLastTask.execute();}
+                FirstTask downloadTheLastTask = new FirstTask(progressDialog, listWithNetAdapter, listView, MainActivity.this, mainIndex);
+                downloadTheLastTask.execute();}
                 else {
                     listWithoutNetAdapter=new ListWithoutNetAdapter(MainActivity.this, mainIndex);
                     FileShowTask fileShowTask=new  FileShowTask(progressDialog,listWithoutNetAdapter,listView,MainActivity.this, mainIndex);
@@ -172,9 +166,7 @@ public class MainActivity extends AppCompatActivity {
             btn10.setBackgroundColor(Color.rgb(211,211,211));}
         if(index==11){btn11.setTextColor(Color.rgb(248,248,255));
             btn11.setBackgroundColor(Color.rgb(211,211,211));}
-
     }
-
     //初始化button
     private void InitRadioButton() {
         horizontalScrollView=(HorizontalScrollView)findViewById(R.id.scrollView) ;
@@ -186,7 +178,7 @@ public class MainActivity extends AppCompatActivity {
                 btn1.setTextColor(Color.rgb(0,0,0));
                 btn1.setBackgroundColor(Color.rgb(248,248,255));
                 currentIndex=1;
-                vp.setCurrentItem(currentIndex-1);
+                viewPagerp.setCurrentItem(currentIndex-1);
                 listView=(ListView)viewList.get(0).findViewById(R.id.list);
                 listView.setOnItemClickListener(new MyListViewClicklistener());
 
@@ -213,7 +205,7 @@ public class MainActivity extends AppCompatActivity {
                 btn2.setTextColor(Color.rgb(0,0,0));
                 btn2.setBackgroundColor(Color.rgb(248,248,255));
                 currentIndex=2;
-                vp.setCurrentItem(currentIndex-1);
+                viewPagerp.setCurrentItem(currentIndex-1);
                 listView=(ListView)viewList.get(1).findViewById(R.id.list);
                 listView.setOnItemClickListener(new MyListViewClicklistener());
                 ifHasNet=isNetworkAvailable(MainActivity.this);
@@ -239,7 +231,7 @@ public class MainActivity extends AppCompatActivity {
                 btn3.setTextColor(Color.rgb(0,0,0));
                 btn3.setBackgroundColor(Color.rgb(248,248,255));
                 currentIndex=3;
-                vp.setCurrentItem(currentIndex-1);
+                viewPagerp.setCurrentItem(currentIndex-1);
                 listView=(ListView)viewList.get(2).findViewById(R.id.list);
                 listView.setOnItemClickListener(new MyListViewClicklistener());
                 ifHasNet=isNetworkAvailable(MainActivity.this);
@@ -265,7 +257,7 @@ public class MainActivity extends AppCompatActivity {
                 btn4.setTextColor(Color.rgb(0,0,0));
                 btn4.setBackgroundColor(Color.rgb(248,248,255));
                 currentIndex=4;
-                vp.setCurrentItem(currentIndex-1);
+                viewPagerp.setCurrentItem(currentIndex-1);
                 listView=(ListView)viewList.get(3).findViewById(R.id.list);
                 listView.setOnItemClickListener(new MyListViewClicklistener());
                 // ifHasNet=isNetworkAvailable(MainActivity.this);
@@ -291,7 +283,7 @@ public class MainActivity extends AppCompatActivity {
                 btn5.setTextColor(Color.rgb(0,0,0));
                 btn5.setBackgroundColor(Color.rgb(248,248,255));
                 currentIndex=5;
-                vp.setCurrentItem(currentIndex-1);
+                viewPagerp.setCurrentItem(currentIndex-1);
                 listView=(ListView)viewList.get(4).findViewById(R.id.list);
                 listView.setOnItemClickListener(new MyListViewClicklistener());
                 ifHasNet=isNetworkAvailable(MainActivity.this);
@@ -317,7 +309,7 @@ public class MainActivity extends AppCompatActivity {
                 btn6.setTextColor(Color.rgb(0,0,0));
                 btn6.setBackgroundColor(Color.rgb(248,248,255));
                 currentIndex=6;
-                vp.setCurrentItem(currentIndex-1);
+                viewPagerp.setCurrentItem(currentIndex-1);
                 listView=(ListView)viewList.get(5).findViewById(R.id.list);
                 listView.setOnItemClickListener(new MyListViewClicklistener());
                 ifHasNet=isNetworkAvailable(MainActivity.this);
@@ -343,7 +335,7 @@ public class MainActivity extends AppCompatActivity {
                 btn7.setTextColor(Color.rgb(0,0,0));
                 btn7.setBackgroundColor(Color.rgb(248,248,255));
                 currentIndex=7;
-                vp.setCurrentItem(currentIndex-1);
+                viewPagerp.setCurrentItem(currentIndex-1);
                 listView=(ListView)viewList.get(6).findViewById(R.id.list);
                 listView.setOnItemClickListener(new MyListViewClicklistener());
                 ifHasNet=isNetworkAvailable(MainActivity.this);
@@ -369,7 +361,7 @@ public class MainActivity extends AppCompatActivity {
                 btn8.setTextColor(Color.rgb(0,0,0));
                 btn8.setBackgroundColor(Color.rgb(248,248,255));
                 currentIndex=8;
-                vp.setCurrentItem(currentIndex-1);
+                viewPagerp.setCurrentItem(currentIndex-1);
                 listView=(ListView)viewList.get(7).findViewById(R.id.list);
                 listView.setOnItemClickListener(new MyListViewClicklistener());
                 ifHasNet=isNetworkAvailable(MainActivity.this);
@@ -395,7 +387,7 @@ public class MainActivity extends AppCompatActivity {
                 btn9.setTextColor(Color.rgb(0,0,0));
                 btn9.setBackgroundColor(Color.rgb(248,248,255));
                 currentIndex=9;
-                vp.setCurrentItem(currentIndex-1);
+                viewPagerp.setCurrentItem(currentIndex-1);
                 listView=(ListView)viewList.get(8).findViewById(R.id.list);
                 listView.setOnItemClickListener(new MyListViewClicklistener());
                 ifHasNet=isNetworkAvailable(MainActivity.this);
@@ -421,7 +413,7 @@ public class MainActivity extends AppCompatActivity {
                 btn10.setTextColor(Color.rgb(0,0,0));
                 btn10.setBackgroundColor(Color.rgb(248,248,255));
                 currentIndex=10;
-                vp.setCurrentItem(currentIndex-1);
+                viewPagerp.setCurrentItem(currentIndex-1);
                 listView=(ListView)viewList.get(9).findViewById(R.id.list);
                 listView.setOnItemClickListener(new MyListViewClicklistener());
                 ifHasNet=isNetworkAvailable(MainActivity.this);
@@ -447,10 +439,10 @@ public class MainActivity extends AppCompatActivity {
                 btn11.setTextColor(Color.rgb(0,0,0));
                 btn11.setBackgroundColor(Color.rgb(248,248,255));
                 currentIndex=11;
-                vp.setCurrentItem(currentIndex-1);
+                viewPagerp.setCurrentItem(currentIndex-1);
                 listView=(ListView)viewList.get(10).findViewById(R.id.list);
                 listView.setOnItemClickListener(new MyListViewClicklistener());
-                ifHasNet=isNetworkAvailable(MainActivity.this);
+                 ifHasNet=isNetworkAvailable(MainActivity.this);
                 if( ifHasNet){
 
                     listWithNetAdapter = new ListWithNetAdapter(MainActivity.this, 10);
@@ -489,55 +481,55 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onScrollStateChanged(AbsListView absListView, int scrollState) {
             if(ifHasNet) {
-                switch (scrollState) {
+                 switch (scrollState) {
 
-                    case AbsListView.OnScrollListener.SCROLL_STATE_IDLE://停止滚动
-                    {   try {
-                        //设置为停止滚动
-                        listWithNetAdapter.setScrollState(false);
-                    }
-                    catch (Exception e){e.printStackTrace();}
-                        //当前屏幕中listview的子项的个数
-                        int count = absListView.getChildCount();
-                        Log.e("MainActivity", count + "");
+                     case AbsListView.OnScrollListener.SCROLL_STATE_IDLE://停止滚动
+                     {   try {
+                         //设置为停止滚动
+                         listWithNetAdapter.setScrollState(false);
+                     }
+                         catch (Exception e){e.printStackTrace();}
+                         //当前屏幕中listview的子项的个数
+                         int count = absListView.getChildCount();
+                         Log.e("MainActivity", count + "");
 
-                        for (int i = 0; i < count; i++) {
+                         for (int i = 0; i < count; i++) {
 
-                            //获取到item的头像
-                            ImageView ima = (ImageView) absListView.getChildAt(i).findViewById(R.id.ima);
+                             //获取到item的头像
+                             ImageView ima = (ImageView) absListView.getChildAt(i).findViewById(R.id.ima);
 
 
-                            if (!ima.getTag().equals("1")) {//!="1"说明需要加载数据
-                                String image_url = ima.getTag().toString();//直接从Tag中取出我们存储的数据image——url
-                                new DownImageTask(ima, true, mainIndex).execute(image_url);
-                                ima.setTag("1");//设置为已加载过数据
-                            }
-                        }
-                        break;
-                    }
-                    case AbsListView.OnScrollListener.SCROLL_STATE_FLING://滚动做出了抛的动作
-                    {
-                        //设置为正在滚动
-                        try {
-                            listWithNetAdapter.setScrollState(true);
+                             if (!ima.getTag().equals("1")) {//!="1"说明需要加载数据
+                                 String image_url = ima.getTag().toString();//直接从Tag中取出我们存储的数据image——url
+                                 new DownImageTask(ima, true, mainIndex).execute(image_url);
+                                 ima.setTag("1");//设置为已加载过数据
+                             }
+                         }
+                         break;
+                     }
+                     case AbsListView.OnScrollListener.SCROLL_STATE_FLING://滚动做出了抛的动作
+                     {
+                         //设置为正在滚动
+                         try {
+                             listWithNetAdapter.setScrollState(true);
 
-                        }
+                         }
+                         catch (Exception e){e.printStackTrace();}
+                         break;
+                     }
+
+                     case AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL://正在滚动
+                     { try {
+                         //设置为正在滚动
+                         listWithNetAdapter.setScrollState(true);
+
+                     }
                         catch (Exception e){e.printStackTrace();}
-                        break;
-                    }
+                         break;
+                     }
+                 }
 
-                    case AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL://正在滚动
-                    { try {
-                        //设置为正在滚动
-                        listWithNetAdapter.setScrollState(true);
-
-                    }
-                    catch (Exception e){e.printStackTrace();}
-                        break;
-                    }
-                }
-
-            }
+             }
 
         }
 
@@ -577,7 +569,8 @@ public class MainActivity extends AppCompatActivity {
     class MyListViewClicklistener implements AdapterView.OnItemClickListener{
         @Override
         public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-            Log.d("haha","qweqwrewrwe");
+            ifHasNet=isNetworkAvailable(MainActivity.this);
+            if(ifHasNet){
             Date date=new Date(listWithNetAdapter.getList().get(position).get("newUrl"),
                     listWithNetAdapter.getList().get(position).get("name"),
                     listWithNetAdapter.getList().get(position).get("type"),
@@ -590,12 +583,9 @@ public class MainActivity extends AppCompatActivity {
             dates.putSerializable("dates",date);
             Intent intent=new Intent(MainActivity.this,SecondActivity.class);
             intent.putExtras(dates);
-            startActivity(intent);
+            startActivity(intent);}
         }
     }
-
-
-
 
 }
 

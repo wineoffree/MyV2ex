@@ -43,7 +43,6 @@ public class DateFromFile {
             if(fileInputStream != null){
                 fileInputStream.close();
             }
-
             JSONArray jsonArray=new JSONArray(resultStr);
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject jsonObject2 = jsonArray.getJSONObject(i);
@@ -78,4 +77,6 @@ public class DateFromFile {
         bitmap=BitmapFactory.decodeFile(filepath+"/"+imaUrl+".png");
         return bitmap;
     }
+
+
 }

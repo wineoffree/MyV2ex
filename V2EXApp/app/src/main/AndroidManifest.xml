@@ -19,6 +19,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".search.SearchChooseActivity" />
+        <activity android:name=".search.SearchUserActivity" />
+        <activity android:name=".search.SearchItemActivity"></activity>
     </application>
 
 </manifest>

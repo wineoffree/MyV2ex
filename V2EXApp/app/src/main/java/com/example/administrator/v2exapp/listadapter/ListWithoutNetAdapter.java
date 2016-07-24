@@ -27,6 +27,8 @@ public class ListWithoutNetAdapter extends BaseAdapter {
     private LayoutInflater layoutInflater;
     private List<Map<String,String>> list;
     int index;
+    //定义当前listview是否在滑动状态
+    private  boolean scrollState=false;
     ArrayList<Bitmap> bitmaps=new ArrayList<Bitmap>();
     public ListWithoutNetAdapter(Context context,int index) {
         this.index=index;
@@ -39,7 +41,9 @@ public class ListWithoutNetAdapter extends BaseAdapter {
     public List getData(){
         return list;
     }
-
+    public void setScrollState(boolean scrollState) {
+        this.scrollState = scrollState;
+    }
     public void setData(List<Map<String,String>> data){
         this.list = data;
     }
@@ -78,7 +82,7 @@ public class ListWithoutNetAdapter extends BaseAdapter {
             viewHolder.time = (TextView)convertView.findViewById(R.id.time);
             viewHolder.name = (TextView)convertView.findViewById(R.id.name);
             viewHolder.type = (TextView)convertView.findViewById(R.id.type);
-            viewHolder.showId = (TextView)convertView.findViewById(R.id.showId);
+            viewHolder.showId = (TextView)convertView.findViewById(R.id.showid);
             convertView.setTag(viewHolder);
         }
         else {

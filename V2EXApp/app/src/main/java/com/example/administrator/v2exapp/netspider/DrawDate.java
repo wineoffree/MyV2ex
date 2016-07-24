@@ -35,14 +35,14 @@ public class DrawDate {
     public DrawDate(String secondUrl){
         this.secondUrl=secondUrl;
     }
-    public  void connectFirst(){
-        try {
-            doc = Jsoup.connect(url+slector[index]).get();
+      public  void connectFirst(){
+          try {
+              doc = Jsoup.connect(url+slector[index]).get();
 
-        }
-        catch (Exception e){e.printStackTrace();}
+          }
+          catch (Exception e){e.printStackTrace();}
 
-    }
+      }
     public  void connectSecond(){
         try {
             doc = Jsoup.connect(secondUrl).get();
@@ -61,7 +61,7 @@ public class DrawDate {
             for (Element date : dates) {
                 JSONObject jsonObject=new JSONObject();
                 Map<String ,String> map = new HashMap<String, String>();
-                String ima =date.select("img[src~=^//cdn.v2ex.co/avatar/.+]").attr("src");
+                String ima =date.select("img[src~=^//cdn.v2ex.co/.+]").attr("src");
                 map.put("ima",ima);jsonObject.put("imaUrl",ima);
                 String newUrl =date.select("span[class~=^item_title$]").select("a").attr("abs:href");
                 map.put("newUrl",newUrl);jsonObject.put("newUrl",newUrl);
@@ -71,16 +71,18 @@ public class DrawDate {
                 map.put("name",name); jsonObject.put("name",name);
                 String type =date.select("span[class~=^small fade$]").select("a").first().text();
                 map.put("type",type);  jsonObject.put("type",type);
-                String time =date.select("span[class~=^small fade$]").select(":contains(分钟前)").text();
+                String time =date.select("span[class~=^small fade$]").select(":contains(前)").text();
                 map.put("time",time );  jsonObject.put("time",time );
+                Log.d("timeasd",date.select("span[class~=^small fade$]").text());
+                Log.d("timeasd",time);
                 String showId=date.select("td[align~=^right$]").select("a").text();
                 map.put("showId",showId);    jsonObject.put("showId",showId);
                 jsonArray.put(jsonObject);
                 list.add(map);
             }
         }
-        catch (Exception e){e.printStackTrace();}
-        // Log.d("haha",dates.toString());
+       catch (Exception e){e.printStackTrace();}
+       // Log.d("haha",dates.toString());
         content=jsonArray.toString();
     }
     //设置第二层topic_content

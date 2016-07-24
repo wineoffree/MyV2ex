@@ -17,7 +17,7 @@ import com.example.administrator.v2exapp.save.SaveToFile;
 public class DownImageTask extends AsyncTask<String, Integer, Bitmap> {
     private String imageUrl;
     private ImageView imageView;
-    private boolean ifAvoid;//判断是否需要防止错位
+   private boolean ifAvoid;//判断是否需要防止错位
 
     private int index;
     public DownImageTask(ImageView imageView,boolean ifAvoid,int index) {
@@ -65,21 +65,21 @@ public class DownImageTask extends AsyncTask<String, Integer, Bitmap> {
 
         if (result != null) {
 
-            imageView.setImageBitmap(result);
+                imageView.setImageBitmap(result);
 
-            try {
-                //图片缓存
-                CacheImage.putBitmap(imageUrl.replaceAll("/","").replace(".png?m=","").replace("_",""),result);
-                //图片存入文件
-                SaveToFile saveToFile=new SaveToFile(index);
-                saveToFile.setBitmap(result);
-                saveToFile.setpath(imageUrl.replaceAll("/","").replace(".png?m=","").replace("_",""));
-                saveToFile.saveBitmap();
-                //图片缓存
-                CacheImage.putBitmap(imageUrl.replaceAll("/","").replace(".png?m=","").replace("_",""),result);
-            }
-            catch (Exception e){e.printStackTrace();}
-            Log.d("wiwiwi",result.toString());
+              try {
+                  //图片缓存
+                  CacheImage.putBitmap(imageUrl.replaceAll("/","").replace(".png?m=","").replace("_",""),result);
+                  //图片存入文件
+                  SaveToFile saveToFile=new SaveToFile(index);
+                  saveToFile.setBitmap(result);
+                  saveToFile.setpath(imageUrl.replaceAll("/","").replace(".png?m=","").replace("_",""));
+                  saveToFile.saveBitmap();
+                  //图片缓存
+                  CacheImage.putBitmap(imageUrl.replaceAll("/","").replace(".png?m=","").replace("_",""),result);
+              }
+              catch (Exception e){e.printStackTrace();}
+                Log.d("wiwiwi",result.toString());
 
         }}
 

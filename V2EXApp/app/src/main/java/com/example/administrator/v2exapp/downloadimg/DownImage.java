@@ -16,7 +16,7 @@ import java.net.URL;
 public class DownImage {
 
     public String image_path;
-    Bitmap bitmap;
+
 
     public DownImage(String image_path) {
         this.image_path = image_path;

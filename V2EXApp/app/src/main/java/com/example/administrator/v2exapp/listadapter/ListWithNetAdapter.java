@@ -26,7 +26,7 @@ public class ListWithNetAdapter extends BaseAdapter {
     private Context context;
     private LayoutInflater layoutInflater;
     private List<Map<String,String>> list;
-    int index;
+     int index;
     //定义当前listview是否在滑动状态
     private  boolean scrollState=false;
     public ListWithNetAdapter(Context context,int index) {
@@ -77,11 +77,11 @@ public class ListWithNetAdapter extends BaseAdapter {
             viewHolder.time = (TextView)convertView.findViewById(R.id.time);
             viewHolder.name = (TextView)convertView.findViewById(R.id.name);
             viewHolder.type = (TextView)convertView.findViewById(R.id.type);
-            viewHolder.showId = (TextView)convertView.findViewById(R.id.showId);
+            viewHolder.showId = (TextView)convertView.findViewById(R.id.showid);
             convertView.setTag(viewHolder);
         }
         else {
-            viewHolder = (ViewHolder)convertView.getTag();
+           viewHolder = (ViewHolder)convertView.getTag();
         }
 
         viewHolder.content.setText(list.get(position).get("content").toString());
